@@ -1,3 +1,4 @@
+package AI;
 // ============================================================
 // Ficheiro: Cenario.java
 // Secção do enunciado: Secção 6 - Os Cenários

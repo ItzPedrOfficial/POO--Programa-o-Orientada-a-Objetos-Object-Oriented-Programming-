@@ -1,3 +1,4 @@
+package AI;
 // ============================================================
 // Ficheiro: AcaoDispositivo.java
 // Secção do enunciado: Secções 4, 5 e 6 (Automações, Escalonamentos e Cenários)

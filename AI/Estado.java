@@ -1,3 +1,4 @@
+package AI;
 // ============================================================
 // Ficheiro: Estado.java
 // Secção do enunciado: Secção 2 - Os Dispositivos

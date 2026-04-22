@@ -1,3 +1,4 @@
+package AI;
 // ============================================================
 // Ficheiro: DomusControl.java
 // Secção do enunciado: Secção 7 (Funcionamento), Secção 8.1 e 8.2

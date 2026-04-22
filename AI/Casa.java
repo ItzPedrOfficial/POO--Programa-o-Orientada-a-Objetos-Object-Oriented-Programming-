@@ -1,3 +1,4 @@
+package AI;
 // ============================================================
 // Ficheiro: Casa.java
 // Secção do enunciado: Secção 1 (Introdução), Secção 7 e Secção 8.1

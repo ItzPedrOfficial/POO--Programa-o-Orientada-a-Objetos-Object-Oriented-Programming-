@@ -1,3 +1,4 @@
+package AI;
 // ============================================================
 // Ficheiro: Divisao.java
 // Secção do enunciado: Secção 1 e 7 - Introdução / Funcionamento

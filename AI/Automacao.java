@@ -1,3 +1,4 @@
+package AI;
 // ============================================================
 // Ficheiro: Automacao.java
 // Secção do enunciado: Secção 4 - As Automações

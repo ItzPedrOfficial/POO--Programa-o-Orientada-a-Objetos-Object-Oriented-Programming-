@@ -1,3 +1,4 @@
+package AI;
 // ============================================================
 // Ficheiro: Escalonamento.java
 // Secção do enunciado: Secção 5 - Os Escalonamentos

@@ -1,3 +1,4 @@
+package AI;
 // ============================================================
 // Ficheiro: Administrador.java
 // Secção do enunciado: Secção 3 - Os Utilizadores
