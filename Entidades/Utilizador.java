@@ -67,12 +67,28 @@ public class Utilizador implements Serializable {
         this.password = password;
     }
 
+    public void addCasasAcessiveis(String casa) {
+        this.casasAcessiveis.add(casa);
+    }
+    
+    public void removeCasasAcessiveis(String casa) {
+        this.casasAcessiveis.remove(casa);
+    }
+
     public Set<String> getCasasAcessiveis() {
         return new HashSet<>(this.casasAcessiveis);
     }
 
     public void setCasasAcessiveis(Set<String> casasAcessiveis) {
         this.casasAcessiveis = new HashSet<>(casasAcessiveis);
+    }
+
+    public void addCasasAdmin(String casa) {
+        this.casasAdmin.add(casa);
+    }
+    
+    public void removeCasasAdmin(String casa) {
+        this.casasAdmin.remove(casa);
     }
 
     public Set<String> getCasasAdmin() {
