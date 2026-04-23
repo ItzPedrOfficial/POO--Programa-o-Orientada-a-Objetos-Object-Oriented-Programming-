@@ -1,0 +1,128 @@
+package Entidades;
+
+import java.io.Serializable;
+
+public class Dispositivo implements Serializable {
+    private String id;
+    private String marca;
+    private String modelo;
+    private int consumo;
+    private boolean ligado;
+
+    // --- Construtores ---
+    
+    public Dispositivo(){
+        this.id = "";
+        this.marca = "";
+        this.modelo = "";
+        this.consumo = 0;
+        this.ligado = false;
+    }
+
+    public Dispositivo(String id, String marca, String modelo, int consumo){
+        this.id = id;
+        this.marca = marca;
+        this.modelo = modelo;
+        this.consumo = consumo;
+        this.ligado = false;
+    }
+
+    public Dispositivo(Dispositivo dis){
+        this.id = dis.getId();
+        this.marca = dis.getMarca();
+        this.modelo = dis.getModelo();
+        this.consumo = dis.getConsumo();
+        this.ligado = false;
+    }
+
+    // --- Getters e Setters ---
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getMarca() {
+        return marca;
+    }
+
+    public void setMarca(String marca) {
+        this.marca = marca;
+    }
+
+    public String getModelo() {
+        return modelo;
+    }
+
+    public void setModelo(String modelo) {
+        this.modelo = modelo;
+    }
+
+    public int getConsumo() {
+        return consumo;
+    }
+
+    public void setConsumo(int consumo) {
+        this.consumo = consumo;
+    }
+
+    public boolean isLigado() {
+        return ligado;
+    }
+
+    public void setLigado(boolean ligado) {
+        this.ligado = ligado;
+    }
+
+    // --- Comportamentos ---
+
+    public void toggle(){
+        this.ligado = !this.ligado;
+    }
+
+    public void ligar(){
+        this.ligado = true;
+    }
+
+    public void desligar(){
+        this.ligado = false;
+    }
+
+    // --- Overrides de Object ---
+
+    @Override
+    public boolean equals(Object o){
+        if (this == o)
+            return true;
+        
+        if (o == null || this.getClass() != o.getClass())
+            return false;
+        
+        Dispositivo dispositivo = (Dispositivo) o;
+        
+        return this.id.equals(dispositivo.getId()) &&
+        this.marca.equals(dispositivo.getMarca()) &&
+        this.modelo.equals(dispositivo.getModelo()) &&
+        this.consumo == dispositivo.getConsumo() &&
+        this.ligado == dispositivo.isLigado();
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(id).append("|");
+        sb.append(marca).append("|");
+        sb.append(modelo).append("|");
+        sb.append(consumo).append("|");
+        sb.append(ligado);
+        return sb.toString();
+    }
+
+    @Override
+    public Dispositivo clone(){
+        return new Dispositivo(this);
+    }
+}
