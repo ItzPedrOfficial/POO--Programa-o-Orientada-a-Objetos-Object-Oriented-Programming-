@@ -11,6 +11,9 @@ public class Dispositivo implements Serializable {
 
     // --- Construtores ---
     
+    /**
+     * Construtor vazio
+     */
     public Dispositivo(){
         this.id = "";
         this.marca = "";
@@ -19,6 +22,14 @@ public class Dispositivo implements Serializable {
         this.ligado = false;
     }
 
+    /**
+     * Construtor parametrizado
+     * 
+     * @param id
+     * @param marca
+     * @param modelo
+     * @param consumo
+     */
     public Dispositivo(String id, String marca, String modelo, int consumo){
         this.id = id;
         this.marca = marca;
@@ -27,6 +38,11 @@ public class Dispositivo implements Serializable {
         this.ligado = false;
     }
 
+    /**
+     * Construtor de cópia
+     * 
+     * @param dis
+     */
     public Dispositivo(Dispositivo dis){
         this.id = dis.getId();
         this.marca = dis.getMarca();
@@ -79,14 +95,23 @@ public class Dispositivo implements Serializable {
 
     // --- Comportamentos ---
 
+    /**
+     * Liga o dispositivo se estiver desligado e desliga se estiver ligado
+     */
     public void toggle(){
         this.ligado = !this.ligado;
     }
 
+    /**
+     * Liga o dispositivo
+     */
     public void ligar(){
         this.ligado = true;
     }
 
+    /**
+     * Desliga o dispositivo
+     */
     public void desligar(){
         this.ligado = false;
     }

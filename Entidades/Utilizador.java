@@ -12,6 +12,9 @@ public class Utilizador implements Serializable {
 
     // --- Construtores ---
     
+    /**
+     * Construtor vazio
+     */
     public Utilizador(){
         this.id = "";
         this.password = "";
@@ -19,6 +22,14 @@ public class Utilizador implements Serializable {
         this.casasAdmin = new HashSet<>();
     }
 
+    /**
+     * Construtor parametrizado
+     * 
+     * @param id
+     * @param password
+     * @param casasAcessiveis
+     * @param casasAdmin
+     */
     public Utilizador(String id, String password, Set<String> casasAcessiveis, Set<String> casasAdmin){
         this.id = id;
         this.password = password;
@@ -26,6 +37,11 @@ public class Utilizador implements Serializable {
         this.casasAdmin = new HashSet<>(casasAdmin);
     }
 
+    /**
+     * Construtor de cópia
+     * 
+     * @param u utilizador a copiar
+     */
     public Utilizador(Utilizador u){
         this.id = u.getId();
         this.password = u.getPassword();
