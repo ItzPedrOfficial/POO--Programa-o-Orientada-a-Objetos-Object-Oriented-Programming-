@@ -1,4 +1,4 @@
-package Entidades;
+package Model;
 
 import java.io.Serializable;
 import java.util.HashSet;

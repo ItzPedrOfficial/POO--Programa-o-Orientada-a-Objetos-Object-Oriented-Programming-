@@ -1,4 +1,4 @@
-package Entidades;
+package Model;
 
 public class Casa {
     private String id;

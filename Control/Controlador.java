@@ -1,4 +1,4 @@
-package Entidades;
+package Control;
 
 import java.io.IOException;
 import java.time.LocalTime;
@@ -14,6 +14,10 @@ import AI.Estado;
 import AI.Lampada;
 import AI.LampadaColorida;
 import AI.Portoide;
+import Model.Casa;
+import Model.Dispositivo;
+import Model.Modelo;
+import Model.Utilizador;
 
 public class Controlador {
     private Modelo modelo;
