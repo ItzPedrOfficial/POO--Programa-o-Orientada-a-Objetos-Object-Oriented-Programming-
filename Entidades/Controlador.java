@@ -1,10 +1,15 @@
 package Entidades;
 
+import java.io.IOException;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import AI.Automacao;
+import AI.Cenario;
 import AI.ColunaSom;
 import AI.Divisao;
+import AI.Escalonamento;
 import AI.Estado;
 import AI.Lampada;
 import AI.LampadaColorida;
@@ -33,6 +38,57 @@ public class Controlador {
     }
     d.setEstado(Estado.DESLIGADO);
     }
+
+
+
+    //criar dispositivos...
+
+    public void criarLampada(String id, String marca, String modelo, int consumo, int intensidade) {
+    if (modelo.getDispositivo(id) != null) {
+        throw new DispositivoJaExisteException("Já existe um dispositivo com o id " + id + ".");
+    }
+    if (intensidade < 0 || intensidade > 100) {
+        throw new ValorInvalidoException("Intensidade deve estar entre 0 e 100.");
+    }
+    modelo.adicionarDispositivo(new Lampada(id, marca, modelo, consumo, intensidade));
+    }
+
+
+
+
+    public void criarLampadaColorida(String id, String marca, String modelo, int consumo, int intensidade, String cor) {
+    if (modelo.getDispositivo(id) != null) {
+        throw new DispositivoJaExisteException("Já existe um dispositivo com o id " + id + ".");
+    }
+    if (intensidade < 0 || intensidade > 100) {
+        throw new ValorInvalidoException("Intensidade deve estar entre 0 e 100.");
+    }
+    modelo.adicionarDispositivo(new LampadaColorida(id, marca, modelo, consumo, intensidade, cor));
+    }
+
+
+
+    public void criarColunaSom(String id, String marca, String modelo, int consumo, int volume) {
+    if (modelo.getDispositivo(id) != null) {
+        throw new DispositivoJaExisteException("Já existe um dispositivo com o id " + id + ".");
+    }
+    if (volume < 0 || volume > 100) {
+        throw new ValorInvalidoException("Volume deve estar entre 0 e 100.");
+    }
+    modelo.adicionarDispositivo(new ColunaSom(id, marca, modelo, consumo, volume));
+    }
+
+
+    public void criarPortoide(String id, String marca, String modelo, int consumo, int abertura) {
+    if (modelo.getDispositivo(id) != null) {
+        throw new DispositivoJaExisteException("Já existe um dispositivo com o id " + id + ".");
+    }
+    if (abertura < 0 || abertura > 100) {
+        throw new ValorInvalidoException("Abertura deve estar entre 0 e 100.");
+    }
+    modelo.adicionarDispositivo(new Portoide(id, marca, modelo, consumo, abertura));
+    }
+
 
     //lampada...
     public void ajustarIntensidade(String id, int intensidade) { //ajustar intensidadade da luz
@@ -142,6 +198,40 @@ public class Controlador {
     return u;
     }
 
+
+    public void adicionarUtilizadorACasa(String emailDono, String emailUtilizador, String nomeCasa) { //verificamos se é o dono a adicionar, se existe o user, a casa e se ja la esta, senao, adicionamos.
+    if (!isDono(emailDono, nomeCasa)) {
+        throw new PermissaoNegadaException("Só o dono pode adicionar utilizadores à casa.");
+    }
+    Utilizador u = modelo.getUtilizador(emailUtilizador);
+    if (u == null) {
+        throw new UtilizadorNaoEncontradoException("Não existe nenhum utilizador com o email " + emailUtilizador + ".");
+    }
+    Casa casa = modelo.getCasa(nomeCasa);
+    if (casa == null) {
+        throw new CasaNaoEncontradaException("Não existe nenhuma casa com o nome " + nomeCasa + ".");
+    }
+    if (casa.contemUtilizador(emailUtilizador)) {
+        throw new UtilizadorJaExisteException("Utilizador já pertence a esta casa.");
+    }
+    casa.adicionarUtilizador(u);
+    }
+     
+
+    public boolean isDono(String emailUtilizador, String nomeCasa) {
+    Utilizador u = modelo.getUtilizador(emailUtilizador);
+    if (u == null) {
+        throw new UtilizadorNaoEncontradoException("Não existe nenhum utilizador com o email " + emailUtilizador + ".");
+    }
+    Casa casa = modelo.getCasa(nomeCasa);
+    if (casa == null) {
+        throw new CasaNaoEncontradaException("Não existe nenhuma casa com o nome " + nomeCasa + ".");
+    }
+    return casa.getDono().equals(u);
+    }
+
+
+
     //casa...
     public void criarCasa(String nome, String morada, String emailDono) { //verificamos se o utilizador (dono)existe, se ja existe uma casa com esse nome, e depois criar a casa e passar como argumento
     Utilizador dono = modelo.getUtilizador(emailDono);  
@@ -156,8 +246,10 @@ public class Controlador {
 
 
     //divisões da casa...
-
-    public void adicionarDivisao(String nomeCasa, String nomeDivisao) { //Procurmaos a casa em modelo e chekamos se ela existe bem como a divisão. Caso não exista a divisão criamo la
+    public void adicionarDivisao(String emailUtilizador, String nomeCasa, String nomeDivisao) {  // verificamos se o user é dono, se a casa existe, se a divisao ja existe ou nao e adicionamos.
+    if (!isDono(emailUtilizador, nomeCasa)) {
+        throw new PermissaoNegadaException("Só o dono pode adicionar divisões.");
+    }
     Casa casa = modelo.getCasa(nomeCasa);
     if (casa == null) {
         throw new CasaNaoEncontradaException("Não existe nenhuma casa com o nome " + nomeCasa + ".");
@@ -168,10 +260,15 @@ public class Controlador {
     casa.adicionarDivisao(new Divisao(nomeDivisao));
     }
 
+
+
     //dispositivo-divisão
 
-    public void associarDispositivoADivisao(String idDispositivo, String nomeDivisao, String nomeCasa) {
-    Casa casa = modelo.getCasa(nomeCasa);  //verificamos se ja ta associado, se a casa e divisao existem e se ja existe este dispositivo e associamos
+    public void associarDispositivoADivisao(String emailUtilizador, String idDispositivo, String nomeDivisao, String nomeCasa) { //verificamos e o utilizador é dono da casa, se a casa existe, se a divisão existe dentro dessa casa, se o dispositivo existe e se já não está associado a essa divisão
+    if (!isDono(emailUtilizador, nomeCasa)) {
+        throw new PermissaoNegadaException("Só o dono pode associar dispositivos.");
+    }
+    Casa casa = modelo.getCasa(nomeCasa);
     if (casa == null) {
         throw new CasaNaoEncontradaException("Não existe nenhuma casa com o nome " + nomeCasa + ".");
     }
@@ -190,7 +287,7 @@ public class Controlador {
     }
 
 
-    // estatissticas
+    // estatisticas...
     public Casa getCasaQueMaisConsome() { //percorre todas as casas com o far até encontrar a que consome mais
     List<Casa> casas = modelo.getCasas();
     if (casas.isEmpty()) {
@@ -253,4 +350,112 @@ public class Controlador {
     }
 
 
+  //automações e escalonamento...
+    public void criarAutomacao(String nomeCasa, String nomeAutomacao, Condicao condicao, List<Acao> acoes) {//verifica se a casa existe e se já há um automação com o mesmo nome. Cria-se e adiciona-se à casa.
+    Casa casa = modelo.getCasa(nomeCasa);
+    if (casa == null) {
+        throw new CasaNaoEncontradaException("Não existe nenhuma casa com o nome " + nomeCasa + ".");
+    }
+    if (casa.getAutomacao(nomeAutomacao) != null) {
+        throw new AutomacaoJaExisteException("Já existe uma automação com o nome " + nomeAutomacao + ".");
+    }
+    casa.adicionarAutomacao(new Automacao(nomeAutomacao, condicao, acoes));
+    }
+
+
+    private void verificarAutomacoes() { //percorre todas as casas e verifica as suas automações. Ativa se necessario. Esta funcão é chamada constantemente pela passar tempo.
+    List<Casa> casas = modelo.getCasas();
+    for (Casa casa : casas) {
+        for (Automacao automacao : casa.getAutomacoes()) {
+            if (automacao.getCondicao().verificar()) {
+                for (Acao acao : automacao.getAcoes()) {
+                    acao.executar();
+                }
+            }
+        }
+    }
+    }
+
+    public void criarEscalonamento(String nomeCasa, String nomeEscalonamento, LocalTime hora, List<Acao> acoes) {
+    Casa casa = modelo.getCasa(nomeCasa);
+    if (casa == null) {
+        throw new CasaNaoEncontradaException("Não existe nenhuma casa com o nome " + nomeCasa + ".");
+    }
+    if (casa.getEscalonamento(nomeEscalonamento) != null) {
+        throw new EscalonamentoJaExisteException("Já existe um escalonamento com o nome " + nomeEscalonamento + ".");
+    }
+    casa.adicionarEscalonamento(new Escalonamento(nomeEscalonamento, hora, acoes));
+    }
+
+
+    private void verificarEscalonamentos() {
+    List<Casa> casas = modelo.getCasas();
+    for (Casa casa : casas) {
+        for (Escalonamento e : casa.getEscalonamentos()) {
+            if (e.getHora().equals(tempoAtual.toLocalTime())) {
+                for (Acao acao : e.getAcoes()) {
+                    acao.executar();
+                }
+            }
+        }
+    }
+    }
+
+ //imp: O escalonamento ativa uma ação com base numa hora (tipo 18h ligfa as luzes, por exemplo), enquanto que a automação é com base numa condição.
+
+    public void avancarTempo(int minutos) {
+    this.tempoAtual = this.tempoAtual.plusMinutes(minutos);
+    verificarEscalonamentos(); 
+    verificarAutomacoes();     
+    }
+
+    //cenarios...
+
+    //os cenarios tem de ser disparados manualmente pelo utilizador.
+
+    public void criarCenario(String emailUtilizador, String nomeCenario, List<Acao> acoes) {
+    Utilizador u = modelo.getUtilizador(emailUtilizador);
+    if (u == null) {
+        throw new UtilizadorNaoEncontradoException("Não existe nenhum utilizador com o email " + emailUtilizador + ".");
+    }
+    if (u.getCenario(nomeCenario) != null) {
+        throw new CenarioJaExisteException("Já existe um cenário com o nome " + nomeCenario + ".");
+    }
+    u.adicionarCenario(new Cenario(nomeCenario, acoes));
+    }
+ 
+
+    public void ativarCenario(String emailUtilizador, String nomeCenario) {
+    Utilizador u = modelo.getUtilizador(emailUtilizador);
+    if (u == null) {
+        throw new UtilizadorNaoEncontradoException("Não existe nenhum utilizador com o email " + emailUtilizador + ".");
+    }
+    Cenario cenario = u.getCenario(nomeCenario);
+    if (cenario == null) {
+        throw new CenarioNaoEncontradoException("Não existe nenhum cenário com o nome " + nomeCenario + ".");
+    }
+    for (Acao acao : cenario.getAcoes()) {
+        acao.executar();
+    }
+    }
+
+    //persistencia...
+
+
+
+    public void guardarEstado(String caminhoFicheiro) { //pede ao modelo para guardar tudo em binario
+    try {
+        modelo.guardar(caminhoFicheiro);
+    } catch (IOException e) {
+        throw new ErroAoGuardarException("Erro ao guardar o estado: " + e.getMessage());
+    }
+    }
+
+    public void carregarEstado(String caminhoFicheiro) { //pede  ao modelo para converter binario num estado e voltarmos a esse estado.
+    try {
+        modelo.carregar(caminhoFicheiro);
+    } catch (IOException e) {
+        throw new ErroAoCarregarException("Erro ao carregar o estado: " + e.getMessage());
+    }
+    }
 }
