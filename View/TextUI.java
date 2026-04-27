@@ -35,14 +35,19 @@ public class TextUI {
     }
 
     private void Login(){
-        System.out.println("Email: ");
-        String email = sc.nextLine();
+        System.out.println("Id: ");
+        String id = sc.nextLine();
         System.out.println("PassWord: ");
         String password = sc.nextLine();
 
         try {
-            this.model.autenticar(email, password);
-            utilizadorAtual = this.model.autenticar(email, password);
+            this.model.autenticar(id, password);
+            utilizadorAtual = this.model.autenticar(id, password);
+            if(!utilizadorAtual.getCasasAdmin().isEmpty()){
+                menu.menuAdministrador();
+            }else{
+                menu.menuUtilizador();
+            }
         } catch (UtilizadorNaoEncontradoException e) {
             System.out.println("Erro: Utilizador Nao Encontrado!");
         } catch (PasswordIncorretaException e){
@@ -52,18 +57,43 @@ public class TextUI {
     // preciso que implementem as mensagem exception 
 
     private void NovoUtilizador(){
-        System.out.println("Insira o nome do Utilizador: ");
-        String nome = sc.nextLine();
-        System.out.println("Insira o email do Utilizador: ");
-        String email = sc.nextLine();
+        System.out.println("Insira o Id do Utilizador: ");
+        String id = sc.nextLine();
         System.out.println("Insira a password do Utilizador: ");
         String password = sc.nextLine();
         
         try {
-            this.model.criarUtilizador(nome, email, password);
+            this.model.criarUtilizador(id, password);
         } catch (UtilizadorJaExisteException e) {
             System.out.println("Erro: Utilizador Já Existe!");
         }
+    }
+
+    private void menuAdministrador(){
+        NewMenu menuAd = new NewMenu(new String[] {"Criar Casa","Gerir Casa","Apagar Casa"});
+        menuAd.setPreCondition(2,  () -> !utilizadorAtual.getCasasAdmin().isEmpty());
+        menuAd.setPreCondition(3,  () -> !utilizadorAtual.getCasasAdmin().isEmpty());
+        menuAd.setHandler(1, () -> criaCasaAdmin());
+        menuAd.setHandler(2, () -> modificaCasaAdmin());
+        menuAd.setHandler(3, () -> apagaCasasAdmin());
+
+        menuAd.run();
+    }
+
+    private void criaCasaAdmin(){
+
+    }
+
+    private void modificaCasaAdmin(){
+
+    }
+
+    private void apagaCasasAdmin(){
+
+    }
+
+    private void menuUtilizador(){
+
     }
 
 

@@ -3,7 +3,9 @@ package Control;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import AI.Automacao;
 import AI.Cenario;
@@ -183,18 +185,18 @@ public class Controlador {
     }
 
     //utilizador...
-
-    public void criarUtilizador(String nome, String email, String password) { //checkamos se existe algum user que ja tenha esse nome,senão, criamos um novo
-    if (modelo.getUtilizador(email) != null) {
-        throw new UtilizadorJaExisteException("Já existe um utilizador com o email " + email + ".");
+    // alterie aqui o email pelo id -> Zé 
+    public void criarUtilizador(String id, String password) { //checkamos se existe algum user que ja tenha esse nome,senão, criamos um novo
+    if (modelo.getUtilizador(id) != null) {
+        throw new UtilizadorJaExisteException("Já existe um utilizador com este ID " + id + ".");
     }
-    modelo.adicionarUtilizador(new Utilizador(nome, email, password));
+    modelo.adicionarUtilizador(new Utilizador(id, password));
     }
 
-    public Utilizador autenticar(String email, String password) { //dar log in
-    Utilizador u = modelo.getUtilizador(email);
+    public Utilizador autenticar(String id, String password) { //dar log in
+    Utilizador u = modelo.getUtilizador(id);
     if (u == null) {
-        throw new UtilizadorNaoEncontradoException("Não existe nenhum utilizador com o email " + email + ".");
+        throw new UtilizadorNaoEncontradoException("Não existe nenhum utilizador com o id " + id + ".");
     }
     if (!u.getPassword().equals(password)) {
         throw new PasswordIncorretaException("Password incorreta.");
@@ -203,29 +205,29 @@ public class Controlador {
     }
 
 
-    public void adicionarUtilizadorACasa(String emailDono, String emailUtilizador, String nomeCasa) { //verificamos se é o dono a adicionar, se existe o user, a casa e se ja la esta, senao, adicionamos.
-    if (!isDono(emailDono, nomeCasa)) {
+    public void adicionarUtilizadorACasa(String idDono, String idUtilizador, String nomeCasa) { //verificamos se é o dono a adicionar, se existe o user, a casa e se ja la esta, senao, adicionamos.
+    if (!isDono(idDono, nomeCasa)) {
         throw new PermissaoNegadaException("Só o dono pode adicionar utilizadores à casa.");
     }
-    Utilizador u = modelo.getUtilizador(emailUtilizador);
+    Utilizador u = modelo.getUtilizador(idUtilizador);
     if (u == null) {
-        throw new UtilizadorNaoEncontradoException("Não existe nenhum utilizador com o email " + emailUtilizador + ".");
+        throw new UtilizadorNaoEncontradoException("Não existe nenhum utilizador com o email " + idUtilizador + ".");
     }
     Casa casa = modelo.getCasa(nomeCasa);
     if (casa == null) {
         throw new CasaNaoEncontradaException("Não existe nenhuma casa com o nome " + nomeCasa + ".");
     }
-    if (casa.contemUtilizador(emailUtilizador)) {
+    if (casa.contemUtilizador(idUtilizador)) {
         throw new UtilizadorJaExisteException("Utilizador já pertence a esta casa.");
     }
     casa.adicionarUtilizador(u);
     }
      
 
-    public boolean isDono(String emailUtilizador, String nomeCasa) {
-    Utilizador u = modelo.getUtilizador(emailUtilizador);
+    public boolean isDono(String idUtilizador, String nomeCasa) {
+    Utilizador u = modelo.getUtilizador(idUtilizador);
     if (u == null) {
-        throw new UtilizadorNaoEncontradoException("Não existe nenhum utilizador com o email " + emailUtilizador + ".");
+        throw new UtilizadorNaoEncontradoException("Não existe nenhum utilizador com o Id " + idUtilizador + ".");
     }
     Casa casa = modelo.getCasa(nomeCasa);
     if (casa == null) {
