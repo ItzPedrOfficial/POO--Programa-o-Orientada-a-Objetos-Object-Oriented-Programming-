@@ -26,16 +26,15 @@ public class Utilizador implements Serializable {
      * Construtor parametrizado
      * 
      * @param id
-     * @param email
      * @param password
      * @param casasAcessiveis
      * @param casasAdmin
      */
-    public Utilizador(String id, String password){
+    public Utilizador(String id, String password, Set<String> casasAcessiveis, Set<String> casasAdmin){
         this.id = id;
         this.password = password;
-        this.casasAcessiveis = new HashSet<>();
-        this.casasAdmin = new HashSet<>();
+        this.casasAcessiveis = new HashSet<>(casasAcessiveis);
+        this.casasAdmin = new HashSet<>(casasAdmin);
     }
 
     /**
@@ -59,7 +58,7 @@ public class Utilizador implements Serializable {
     public void setId(String id) {
         this.id = id;
     }
-
+    
     public String getPassword() {
         return password;
     }
@@ -84,6 +83,7 @@ public class Utilizador implements Serializable {
         this.casasAcessiveis = new HashSet<>(casasAcessiveis);
     }
 
+    // ter a certeza que tb está nas acessiveis
     public void addCasasAdmin(String casa) {
         this.casasAdmin.add(casa);
     }
