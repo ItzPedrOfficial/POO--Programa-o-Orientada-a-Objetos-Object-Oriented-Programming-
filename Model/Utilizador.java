@@ -72,6 +72,7 @@ public class Utilizador implements Serializable {
     }
     
     public void removeCasasAcessiveis(String casa) {
+        if (this.casasAdmin.contains(casa)) this.casasAdmin.remove(casa);
         this.casasAcessiveis.remove(casa);
     }
 
@@ -83,8 +84,8 @@ public class Utilizador implements Serializable {
         this.casasAcessiveis = new HashSet<>(casasAcessiveis);
     }
 
-    // ter a certeza que tb está nas acessiveis
     public void addCasasAdmin(String casa) {
+        if (!this.casasAcessiveis.contains(casa)) this.casasAcessiveis.add(casa);
         this.casasAdmin.add(casa);
     }
     
