@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import AI.Automacao;
@@ -185,7 +186,6 @@ public class Controlador {
     }
 
     //utilizador...
-    // alterie aqui o email pelo id -> Zé 
     public void criarUtilizador(String id, String password) { //checkamos se existe algum user que ja tenha esse nome,senão, criamos um novo
     if (modelo.getUtilizador(id) != null) {
         throw new UtilizadorJaExisteException("Já existe um utilizador com este ID " + id + ".");
@@ -239,15 +239,19 @@ public class Controlador {
 
 
     //casa...
-    public void criarCasa(String nome, String morada, String emailDono) { //verificamos se o utilizador (dono)existe, se ja existe uma casa com esse nome, e depois criar a casa e passar como argumento
-    Utilizador dono = modelo.getUtilizador(emailDono);  
+
+
+    //public void apagarCasa(String idUtilizador, String nomeCasa){se o User for dono ,remove a casa do modelo }
+
+    public void criarCasa(String nome, String morada, String idDono) { //verificamos se o utilizador (dono)existe, se ja existe uma casa com esse nome, e depois criar a casa e passar como argumento
+    Utilizador dono = modelo.getUtilizador(idDono);  
     if (dono == null) {
-        throw new UtilizadorNaoEncontradoException("Não existe nenhum utilizador com o email " + emailDono + ".");
+        throw new UtilizadorNaoEncontradoException("Não existe nenhum utilizador com o email " + idDono + ".");
     }
     if (modelo.getCasa(nome) != null) {
         throw new CasaJaExisteException("Já existe uma casa com o nome " + nome + ".");
     }
-    modelo.adicionarCasa(new Casa(nome, morada, dono));
+    modelo.adicionarCasa(new Casa(nome, morada, idDono));
     }
 
 
@@ -269,6 +273,15 @@ public class Controlador {
 
 
     //dispositivo-divisão
+
+    // Adicionei isto ,Zé
+    public Map<String, Dispositivo> getDispositivosDaCasa(String nomeCasa) {
+        Casa casa = modelo.getCasa(nomeCasa);
+        if (casa == null) {
+            throw new CasaNaoEncontradaException("Casa não encontrada!");
+        }
+        return casa.getDispositivos();
+    }
 
     public void associarDispositivoADivisao(String emailUtilizador, String idDispositivo, String nomeDivisao, String nomeCasa) { //verificamos e o utilizador é dono da casa, se a casa existe, se a divisão existe dentro dessa casa, se o dispositivo existe e se já não está associado a essa divisão
     if (!isDono(emailUtilizador, nomeCasa)) {
@@ -431,7 +444,7 @@ public class Controlador {
     }
  
 
-    public void ativarCenario(String emailUtilizador, String nomeCenario) {
+    public void ativarCenario(String idUtilizador, String nomeCenario) {
     Utilizador u = modelo.getUtilizador(emailUtilizador);
     if (u == null) {
         throw new UtilizadorNaoEncontradoException("Não existe nenhum utilizador com o email " + emailUtilizador + ".");
