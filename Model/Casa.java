@@ -107,6 +107,34 @@ public class Casa implements Serializable{
         this.divisoes.remove(nome);
     }
 
+    // --- Comportamentos ---
+
+    public void toggleDispositivo(String dispositivo) {
+        this.dispositivos.get(dispositivo).toggle();
+    }
+    
+    public void ligarDispositivo(String dispositivo) {
+        this.dispositivos.get(dispositivo).ligar();
+    }
+
+    public void desligarDispositivo(String dispositivo) {
+        this.dispositivos.get(dispositivo).desligar();
+    }
+
+    public int quantosDispositivos() {
+        return (int) this.dispositivos.values().stream()
+                                      .count();
+    }
+
+    public int quantasDivisoes() {
+        return (int) this.divisoes.values().stream()
+                                  .count();
+    }
+
+    public Dispositivo getDispositivo(String dispositivo) {
+        return this.dispositivos.get(dispositivo).clone();
+    }
+
     // --- Overrides de Object ---
     
     @Override

@@ -1,36 +1,30 @@
 package Model;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Divisao implements Serializable{
-    private String nome;
+public class AcaoMultiplosDispositivos extends Acao{
     private Set<String> dispositivos;
 
-    public Divisao(){
-        this.nome = "";
-        this.dispositivos = new HashSet<>();
-    }
+    // --- Construtores ---
 
-    public Divisao(String nome, Set<String> dispositivos){
-        this.nome = nome;
+    public AcaoMultiplosDispositivos() {
+        super();
         this.dispositivos = new HashSet<>(dispositivos);
     }
-
-    public Divisao(Divisao div){
-        this.nome = div.getNome();
-        this.dispositivos = div.getDispositivos();
+    
+    public AcaoMultiplosDispositivos(Set<String> dispositivos, String operacao, int valor) {
+        super(operacao, valor);
+        this.dispositivos = dispositivos;
     }
 
-    public String getNome() {
-        return nome;
+    public AcaoMultiplosDispositivos(AcaoMultiplosDispositivos ad) {
+        super(ad);
+        this.dispositivos = ad.getDispositivos();
     }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
+    
+    // --- Getters e Setters ---
+    
     public void addDispositivo(String dispositivo) {
         this.dispositivos.add(dispositivo);
     }
@@ -46,7 +40,7 @@ public class Divisao implements Serializable{
     public void setDispositivos(Set<String> dispositivos) {
         this.dispositivos = new HashSet<>(dispositivos);
     }
-
+    
     // --- Overrides de Object ---
     
     @Override
@@ -57,23 +51,23 @@ public class Divisao implements Serializable{
         if (o == null || this.getClass() != o.getClass())
             return false;
         
-        Divisao divisao = (Divisao) o;
+        AcaoMultiplosDispositivos ad = (AcaoMultiplosDispositivos) o;
         
-        return this.nome.equals(divisao.getNome()) &&
-               this.dispositivos.equals(divisao.getDispositivos());
+        return super.equals(ad) &&
+               this.dispositivos.equals(ad.getDispositivos());
     }
-    
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(nome).append("|");
-        sb.append(dispositivos.toString());
+        sb.append(super.toString());
+        sb.append("Ids dos Dispositivos: ").append(dispositivos.toString());
         return sb.toString();
     }
 
     @Override
-    public Divisao clone(){
-        return new Divisao(this);
+    public AcaoMultiplosDispositivos clone(){
+        return new AcaoMultiplosDispositivos(this);
     }
 
 }

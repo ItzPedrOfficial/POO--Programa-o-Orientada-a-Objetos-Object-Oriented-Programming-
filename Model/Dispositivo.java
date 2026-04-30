@@ -2,7 +2,7 @@ package Model;
 
 import java.io.Serializable;
 
-public class Dispositivo implements Serializable {
+public class Dispositivo implements Serializable, Operavel {
     private String id;
     private String marca;
     private String modelo;
@@ -116,6 +116,14 @@ public class Dispositivo implements Serializable {
         this.ligado = false;
     }
 
+    public void executarOperacao(String operacao, int valor) {
+        switch (operacao) {
+            case "ligar" -> ligar();
+            case "desligar" -> desligar();
+            case "toggle" -> toggle();
+        }
+    }
+
     // --- Overrides de Object ---
 
     @Override
@@ -138,11 +146,11 @@ public class Dispositivo implements Serializable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(id).append("|");
-        sb.append(marca).append("|");
-        sb.append(modelo).append("|");
-        sb.append(consumo).append("|");
-        sb.append(ligado);
+        sb.append("Id: ").append(id).append(" | ");
+        sb.append("Marca: ").append(marca).append(" | ");
+        sb.append("Modelo: ").append(modelo).append(" | ");
+        sb.append("Consumo: ").append(consumo).append(" | ");
+        sb.append("Ligado: ").append(ligado);
         return sb.toString();
     }
 
