@@ -95,7 +95,6 @@ public class Casa implements Serializable{
         this.dispositivos.remove(id);
     }
 
-
     public void addDivisao(String nome, Set<String> dispositivos) {
         this.divisoes.put(nome, new Divisao(nome, dispositivos));
     }
