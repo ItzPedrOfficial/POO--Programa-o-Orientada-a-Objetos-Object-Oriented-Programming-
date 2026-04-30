@@ -109,16 +109,28 @@ public class Casa implements Serializable{
 
     // --- Comportamentos ---
 
-    public void toggleDispositivo(String dispositivo) {
+    public void toggle(String dispositivo) {
         this.dispositivos.get(dispositivo).toggle();
     }
     
-    public void ligarDispositivo(String dispositivo) {
+    public void ligar(String dispositivo) {
         this.dispositivos.get(dispositivo).ligar();
     }
 
-    public void desligarDispositivo(String dispositivo) {
+    public void desligar(String dispositivo) {
         this.dispositivos.get(dispositivo).desligar();
+    }
+
+    public void toggle(Set<String> dispositivos) {
+        dispositivos.forEach(disp ->  this.dispositivos.get(disp).toggle());
+    }
+
+    public void ligar(Set<String> dispositivos) {
+        dispositivos.forEach(disp ->  this.dispositivos.get(disp).ligar());
+    }
+
+    public void desligar(Set<String> dispositivos) {
+        dispositivos.forEach(disp ->  this.dispositivos.get(disp).desligar());
     }
 
     public int quantosDispositivos() {
@@ -133,6 +145,10 @@ public class Casa implements Serializable{
 
     public Dispositivo getDispositivo(String dispositivo) {
         return this.dispositivos.get(dispositivo).clone();
+    }
+
+    public Divisao getDivisao(String divisao) {
+        return this.divisoes.get(divisao).clone();
     }
 
     // --- Overrides de Object ---
