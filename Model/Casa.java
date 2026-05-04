@@ -163,11 +163,11 @@ public class Casa implements Serializable{
         dispositivos.forEach(disp ->  this.dispositivos.get(disp).desligar());
     }
 
-    public void executarOperacao(String dispositivo, String operacao, int valor) {
+    public void executarOperacao(String dispositivo, String operacao, Object valor) {
         this.dispositivos.get(dispositivo).executarOperacao(operacao, valor);
     }
 
-    public void executarOperacao(Set<String> dispositivos, String operacao, int valor) {
+    public void executarOperacao(Set<String> dispositivos, String operacao, Object valor) {
         dispositivos.forEach(disp -> this.dispositivos.get(disp).executarOperacao(operacao, valor));
     }
 

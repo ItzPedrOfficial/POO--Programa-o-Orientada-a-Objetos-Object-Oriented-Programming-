@@ -1,10 +1,11 @@
 package Model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Cenario {
+public class Cenario implements Serializable{
     private String nome;
     private Set<Acao> acoes;
 

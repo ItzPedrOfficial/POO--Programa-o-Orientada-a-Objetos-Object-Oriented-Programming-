@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public abstract class Acao implements Serializable{
     private String operacao;
-    private int valor;
+    private Object valor;
 
     // --- Construtores ---
 
@@ -13,7 +13,7 @@ public abstract class Acao implements Serializable{
         this.valor = 0;
     }
     
-    public Acao(String operacao, int valor) {
+    public Acao(String operacao, Object valor) {
         this.operacao = operacao;
         this.valor = valor;
     }
@@ -33,11 +33,11 @@ public abstract class Acao implements Serializable{
         this.operacao = operacao;
     }
 
-    public int getValor() {
+    public Object getValor() {
         return valor;
     }
 
-    public void setValor(int valor) {
+    public void setValor(Object valor) {
         this.valor = valor;
     }
     
@@ -54,7 +54,7 @@ public abstract class Acao implements Serializable{
         Acao ad = (Acao) o;
         
         return this.operacao.equals(ad.getOperacao()) &&
-               this.valor == ad.getValor();
+               this.valor.equals(ad.getValor());
     }
 
     @Override

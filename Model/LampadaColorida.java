@@ -15,7 +15,7 @@ public class LampadaColorida extends Lampada{
         this.cor = "Branco";
     }
 
-    public LampadaColorida(Lampada lamp){
+    public LampadaColorida(LampadaColorida lamp){
         super(lamp);
         this.cor = "Branco";
     }
@@ -62,7 +62,7 @@ public class LampadaColorida extends Lampada{
     }
 
     @Override
-    public Lampada clone(){
-        return new Lampada(this);
+    public LampadaColorida clone(){
+        return new LampadaColorida(this);
     }
 }
