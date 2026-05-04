@@ -1,6 +1,6 @@
 package Model;
 
 public interface Operavel {
-    void executarOperacao(String operacao, int valor);
+    void executarOperacao(String operacao, Object valor);
     
 }

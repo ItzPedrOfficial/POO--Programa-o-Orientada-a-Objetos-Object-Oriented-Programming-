@@ -1,38 +1,38 @@
 package Model;
 
-public class Lampada extends Dispositivo {
-    private int luminosidade;
+public class LampadaColorida extends Lampada{
+    private String cor;
 
     // --- Construtores ---
 
-    public Lampada(){
+    public LampadaColorida(){
         super();
-        this.luminosidade = 0;
+        this.cor = "Branco";
     }
 
-    public Lampada(String id, String marca, String modelo, int consumo){
+    public LampadaColorida(String id, String marca, String modelo, int consumo){
         super(id, marca, modelo, consumo);
-        this.luminosidade = 0;
+        this.cor = "Branco";
     }
 
-    public Lampada(Lampada lamp){
+    public LampadaColorida(Lampada lamp){
         super(lamp);
-        this.luminosidade = 0;
+        this.cor = "Branco";
     }
 
     // --- Getters e Setters ---
 
-    public int getLuminosidade() {
-        return luminosidade;
+    public String getCor() {
+        return cor;
     }
 
-    public void setLuminosidade(int luminosidade) {
-        this.luminosidade = luminosidade;
+    public void setCor(String cor) {
+        this.cor = cor;
     }
 
     public void executarOperacao(String operacao, Object valor) {  
         switch (operacao) {
-            case "setLuminosidade" -> setLuminosidade((int) valor);
+            case "setCor" -> setCor((String) valor);
             default -> super.executarOperacao(operacao, valor);
         }
     }
@@ -47,17 +47,17 @@ public class Lampada extends Dispositivo {
         if (o == null || this.getClass() != o.getClass())
             return false;
         
-        Lampada lampada = (Lampada) o;
+        LampadaColorida lampada = (LampadaColorida) o;
         
         return super.equals(lampada) &&
-               this.luminosidade == lampada.getLuminosidade();
+               this.cor.equals(lampada.getCor());
     }
     
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(super.toString()).append("\n");
-        sb.append("Luminosidade: ").append(luminosidade);
+        sb.append("Cor: ").append(cor);
         return sb.toString();
     }
 

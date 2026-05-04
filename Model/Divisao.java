@@ -66,7 +66,7 @@ public class Divisao implements Serializable{
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(nome).append("|");
+        sb.append(nome).append("\n");
         sb.append(dispositivos.toString());
         return sb.toString();
     }

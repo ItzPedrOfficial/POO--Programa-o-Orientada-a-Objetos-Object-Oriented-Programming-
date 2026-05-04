@@ -116,7 +116,7 @@ public class Dispositivo implements Serializable, Operavel {
         this.ligado = false;
     }
 
-    public void executarOperacao(String operacao, int valor) {
+    public void executarOperacao(String operacao, Object valor) {
         switch (operacao) {
             case "ligar" -> ligar();
             case "desligar" -> desligar();
@@ -146,10 +146,10 @@ public class Dispositivo implements Serializable, Operavel {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Id: ").append(id).append(" | ");
-        sb.append("Marca: ").append(marca).append(" | ");
-        sb.append("Modelo: ").append(modelo).append(" | ");
-        sb.append("Consumo: ").append(consumo).append(" | ");
+        sb.append("Id: ").append(id).append("\n");
+        sb.append("Marca: ").append(marca).append("\n");
+        sb.append("Modelo: ").append(modelo).append("\n");
+        sb.append("Consumo: ").append(consumo).append("\n");
         sb.append("Ligado: ").append(ligado);
         return sb.toString();
     }

@@ -122,9 +122,9 @@ public class Utilizador implements Serializable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(id).append("|");
-        sb.append(password).append("|");
-        sb.append(casasAcessiveis.toString()).append("|");
+        sb.append(id).append("\n");
+        sb.append(password).append("\n");
+        sb.append(casasAcessiveis.toString()).append("\n");
         sb.append(casasAdmin.toString());
         return sb.toString();
     }

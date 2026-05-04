@@ -1,38 +1,38 @@
 package Model;
 
-public class Lampada extends Dispositivo {
-    private int luminosidade;
+public class ColunaDeSom extends Dispositivo{
+    private int volume;
 
     // --- Construtores ---
 
-    public Lampada(){
+    public ColunaDeSom(){
         super();
-        this.luminosidade = 0;
+        this.volume = 0;
     }
 
-    public Lampada(String id, String marca, String modelo, int consumo){
+    public ColunaDeSom(String id, String marca, String modelo, int consumo){
         super(id, marca, modelo, consumo);
-        this.luminosidade = 0;
+        this.volume = 0;
     }
 
-    public Lampada(Lampada lamp){
-        super(lamp);
-        this.luminosidade = 0;
+    public ColunaDeSom(ColunaDeSom col){
+        super(col);
+        this.volume = 0;
     }
 
     // --- Getters e Setters ---
 
-    public int getLuminosidade() {
-        return luminosidade;
+    public int getVolume() {
+        return volume;
     }
 
-    public void setLuminosidade(int luminosidade) {
-        this.luminosidade = luminosidade;
+    public void setVolume(int volume) {
+        this.volume = volume;
     }
 
     public void executarOperacao(String operacao, Object valor) {  
         switch (operacao) {
-            case "setLuminosidade" -> setLuminosidade((int) valor);
+            case "setVolume" -> setVolume((int) valor);
             default -> super.executarOperacao(operacao, valor);
         }
     }
@@ -47,22 +47,22 @@ public class Lampada extends Dispositivo {
         if (o == null || this.getClass() != o.getClass())
             return false;
         
-        Lampada lampada = (Lampada) o;
+        ColunaDeSom coluna = (ColunaDeSom) o;
         
-        return super.equals(lampada) &&
-               this.luminosidade == lampada.getLuminosidade();
+        return super.equals(coluna) &&
+               this.volume == coluna.getVolume();
     }
     
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(super.toString()).append("\n");
-        sb.append("Luminosidade: ").append(luminosidade);
+        sb.append("Volume: ").append(volume);
         return sb.toString();
     }
 
     @Override
-    public Lampada clone(){
-        return new Lampada(this);
+    public ColunaDeSom clone(){
+        return new ColunaDeSom(this);
     }
 }

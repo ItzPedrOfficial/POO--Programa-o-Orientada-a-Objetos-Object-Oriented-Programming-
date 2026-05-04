@@ -49,7 +49,7 @@ public class AcaoDispositivo extends Acao{
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(super.toString());
+        sb.append(super.toString()).append("\n");
         sb.append("Id do Dispositivo: ").append(idDispositivo);
         return sb.toString();
     }

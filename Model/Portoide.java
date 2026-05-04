@@ -1,38 +1,38 @@
 package Model;
 
-public class Lampada extends Dispositivo {
-    private int luminosidade;
+public class Portoide extends Dispositivo{
+    private int abertura;
 
     // --- Construtores ---
 
-    public Lampada(){
+    public Portoide(){
         super();
-        this.luminosidade = 0;
+        this.abertura = 0;
     }
 
-    public Lampada(String id, String marca, String modelo, int consumo){
+    public Portoide(String id, String marca, String modelo, int consumo){
         super(id, marca, modelo, consumo);
-        this.luminosidade = 0;
+        this.abertura = 0;
     }
 
-    public Lampada(Lampada lamp){
-        super(lamp);
-        this.luminosidade = 0;
+    public Portoide(Portoide por){
+        super(por);
+        this.abertura = 0;
     }
 
     // --- Getters e Setters ---
 
-    public int getLuminosidade() {
-        return luminosidade;
+    public int getAbertura() {
+        return abertura;
     }
 
-    public void setLuminosidade(int luminosidade) {
-        this.luminosidade = luminosidade;
+    public void setAbertura(int abertura) {
+        this.abertura = abertura;
     }
 
     public void executarOperacao(String operacao, Object valor) {  
         switch (operacao) {
-            case "setLuminosidade" -> setLuminosidade((int) valor);
+            case "setAbertura" -> setAbertura((int) valor);
             default -> super.executarOperacao(operacao, valor);
         }
     }
@@ -47,22 +47,22 @@ public class Lampada extends Dispositivo {
         if (o == null || this.getClass() != o.getClass())
             return false;
         
-        Lampada lampada = (Lampada) o;
+        Portoide portoide = (Portoide) o;
         
-        return super.equals(lampada) &&
-               this.luminosidade == lampada.getLuminosidade();
+        return super.equals(portoide) &&
+               this.abertura == portoide.getAbertura();
     }
     
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(super.toString()).append("\n");
-        sb.append("Luminosidade: ").append(luminosidade);
+        sb.append("Abertura: ").append(abertura);
         return sb.toString();
     }
 
     @Override
-    public Lampada clone(){
-        return new Lampada(this);
+    public Portoide clone(){
+        return new Portoide(this);
     }
 }

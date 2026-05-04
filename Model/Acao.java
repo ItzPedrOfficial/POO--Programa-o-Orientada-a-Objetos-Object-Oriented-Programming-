@@ -2,7 +2,7 @@ package Model;
 
 import java.io.Serializable;
 
-public class Acao implements Serializable{
+public abstract class Acao implements Serializable{
     private String operacao;
     private int valor;
 
@@ -60,13 +60,11 @@ public class Acao implements Serializable{
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Operacao: ").append(operacao).append(" | ");
+        sb.append("Operacao: ").append(operacao).append("\n");
         sb.append("Valor: ").append(valor);
         return sb.toString();
     }
 
     @Override
-    public Acao clone(){
-        return new Acao(this);
-    }
+    public abstract Acao clone();
 }

@@ -10,12 +10,12 @@ public class AcaoMultiplosDispositivos extends Acao{
 
     public AcaoMultiplosDispositivos() {
         super();
-        this.dispositivos = new HashSet<>(dispositivos);
+        this.dispositivos = new HashSet<>();
     }
     
     public AcaoMultiplosDispositivos(Set<String> dispositivos, String operacao, int valor) {
         super(operacao, valor);
-        this.dispositivos = dispositivos;
+        this.dispositivos = new HashSet<>(dispositivos);
     }
 
     public AcaoMultiplosDispositivos(AcaoMultiplosDispositivos ad) {
@@ -60,7 +60,7 @@ public class AcaoMultiplosDispositivos extends Acao{
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(super.toString());
+        sb.append(super.toString()).append("\n");
         sb.append("Ids dos Dispositivos: ").append(dispositivos.toString());
         return sb.toString();
     }
