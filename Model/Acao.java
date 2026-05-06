@@ -1,6 +1,7 @@
 package Model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public abstract class Acao implements Serializable{
     private String operacao;
@@ -55,6 +56,11 @@ public abstract class Acao implements Serializable{
         
         return this.operacao.equals(ad.getOperacao()) &&
                this.valor.equals(ad.getValor());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(operacao, valor);
     }
 
     @Override

@@ -2,6 +2,7 @@ package Model;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -62,6 +63,11 @@ public class Cenario implements Serializable{
         
         return this.nome.equals(cenario.getNome()) &&
                this.acoes.equals(cenario.getAcoes());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nome, acoes);
     }
     
     @Override
