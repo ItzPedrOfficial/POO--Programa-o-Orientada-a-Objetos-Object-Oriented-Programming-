@@ -13,6 +13,7 @@ public class Casa implements Serializable{
     private Map<String, Dispositivo> dispositivos;
     private Map<String, Divisao> divisoes;
     private Map<String, Cenario> cenarios;
+       private Map<String, Automacao> automacoes; //Pedro
 
     // --- Construtores ---
 
@@ -22,6 +23,7 @@ public class Casa implements Serializable{
         this.dispositivos = new HashMap<>();
         this.divisoes = new HashMap<>();
         this.cenarios = new HashMap<>();
+        this.automacoes = new HashMap<>();//Pedro
     }
 
     public Casa(String id, String morada, Map<String, Dispositivo> dispositivos, Map<String, Divisao> divisoes, Map<String, Cenario> cenarios) {
@@ -36,6 +38,8 @@ public class Casa implements Serializable{
         this.cenarios = cenarios.values().stream()
                                          .map(Cenario::clone)
                                          .collect(Collectors.toMap(c -> c.getNome(), c -> c));
+        this.automacoes = new HashMap<>();
+       
     }
 
     public Casa(Casa casa) {
@@ -44,6 +48,7 @@ public class Casa implements Serializable{
         this.dispositivos = casa.getDispositivos();
         this.divisoes = casa.getDivisoes();
         this.cenarios = casa.getCenarios();
+        this.automacoes = casa.getAutomacoes();
     }
 
     // --- Getters e Setters ---
@@ -138,6 +143,40 @@ public class Casa implements Serializable{
         this.cenarios.remove(nome);
     }
 
+    public void addAutomacao(Automacao automacao) {
+    this.automacoes.put(automacao.getNome(), automacao.clone());
+    }
+
+    public void removeAutomacao(String nome) {
+    this.automacoes.remove(nome);
+    }
+    
+
+    public Automacao getAutomacao(String nome) {
+    Automacao a = this.automacoes.get(nome);
+    return a == null ? null : a.clone();
+    }
+
+    public void verificarEExecutarAutomacoes(LocalDateTime agora) {
+    for (Automacao a : this.automacoes.values()) {
+        if (a.getCondicao() != null && a.getCondicao().verificar()) {
+            for (Acao acao : a.getAcoes()) {
+                if (acao instanceof AcaoDispositivo ad)
+                    this.executarOperacao(agora, ad);
+                else if (acao instanceof AcaoMultiplosDispositivos am)
+                    this.executarOperacao(agora, am);
+             }
+        }
+        }
+    }
+
+    public Map<String, Automacao> getAutomacoes() {
+    return automacoes.values().stream()
+                              .map(Automacao::clone)
+                              .collect(Collectors.toMap(a -> a.getNome(), a -> a));
+    }
+
+
     // --- Comportamentos ---
 
     public void toggle(LocalDateTime agora, String dispositivo) {
@@ -204,17 +243,28 @@ public class Casa implements Serializable{
                                   .count();
     }
 
-    public Dispositivo getDispositivo(String dispositivo) {
-        return this.dispositivos.get(dispositivo).clone();
+    public Dispositivo getDispositivo(String dispositivo) { //Pedro, alterado para nao crashar
+    Dispositivo d = this.dispositivos.get(dispositivo);
+    return d == null ? null : d.clone();
     }
 
     public Divisao getDivisao(String divisao) {
-        return this.divisoes.get(divisao).clone();
+    Divisao d = this.divisoes.get(divisao);
+    return d == null ? null : d.clone();
     }
 
     public Cenario getCenario(String cenario) {
-        return this.cenarios.get(cenario).clone();
+    Cenario c = this.cenarios.get(cenario);
+    return c == null ? null : c.clone();
     }
+
+    public int getConsumoTotal() {
+    return this.dispositivos.values().stream()
+            .filter(Dispositivo::isLigado)
+            .mapToInt(Dispositivo::getConsumo)
+            .sum();
+    }
+
 
     // --- Overrides de Object ---
     
@@ -250,5 +300,9 @@ public class Casa implements Serializable{
     public Casa clone(){
         return new Casa(this);
     }
+
+
+
+
 
 }

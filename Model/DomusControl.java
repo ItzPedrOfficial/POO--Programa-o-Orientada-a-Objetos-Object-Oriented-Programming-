@@ -235,7 +235,25 @@ public class DomusControl implements Serializable {
     public void executarCenario(String idCasa, String nomeCenario) {
         this.casas.get(idCasa).executarCenario(tempoAtual, nomeCenario);
     }
- 
+
+    // --- Gestao de Automacoes ---
+
+    public void addAutomacao(String idCasa, Automacao automacao) { //Pedro
+    this.casas.get(idCasa).addAutomacao(automacao);
+    }
+
+    public void removeAutomacao(String idCasa, String nomeAutomacao) {
+    this.casas.get(idCasa).removeAutomacao(nomeAutomacao);
+    }
+
+    public Automacao getAutomacao(String idCasa, String nomeAutomacao) {
+    return this.casas.get(idCasa).getAutomacao(nomeAutomacao);
+    }
+
+    public void verificarEExecutarAutomacoes() {
+    this.casas.values().forEach(c -> c.verificarEExecutarAutomacoes(this.tempoAtual));
+    }
+
     // --- Estatisticas ---
  
     public Casa casaQueMaisConsome() {

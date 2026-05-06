@@ -1,250 +1,527 @@
 package View;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import static Control.Exceptions.*;
 
-import Control.Controlador;
-import Model.Casa;
-import Model.Dispositivo;
-import Model.Utilizador;
-import View.NewMenu; 
+import Control.*;
+import Control.Exceptions.CasaJaExisteException;
+import Control.Exceptions.DispositivoJaAssociadoException;
+import Control.Exceptions.DispositivoJaExisteException;
+import Control.Exceptions.DispositivoNaoEncontradoException;
+import Control.Exceptions.DivisaoJaExisteException;
+import Control.Exceptions.DivisaoNaoEncontradaException;
+import Control.Exceptions.PasswordIncorretaException;
+import Control.Exceptions.PermissaoNegadaException;
+import Control.Exceptions.UtilizadorJaExisteException;
+import Control.Exceptions.UtilizadorNaoEncontradoException;
+import Model.*;
 
 public class TextUI {
-    private Controlador model;
+
+    private Controlador controlador;
     private Utilizador utilizadorAtual;
-    //scanner 
     private Scanner sc;
 
-    /**
-     * Construtor que cria os menus e o model
-     */
-
     public TextUI(Controlador controlador) {
-        this.model = controlador;
+        this.controlador = controlador;
         this.sc = new Scanner(System.in);
-    } 
+    }
 
+    // -------------------------------------------------------------------------
+    // Entrada
+    // -------------------------------------------------------------------------
 
-    public void run(){
-        NewMenu menu = new NewMenu(new String[] {"Login","Novo Utilizador"});
-        menu.setHandler(1, () -> Login());
-        menu.setHandler(2, () -> NovoUtilizador());
-
+    public void run() {
+        NewMenu menu = new NewMenu(new String[] { "Login", "Novo Utilizador" });
+        menu.setHandler(1, () -> login());
+        menu.setHandler(2, () -> novoUtilizador());
         menu.run();
     }
 
-    private void Login(){
-        System.out.println("Id: ");
+    private void login() {
+        System.out.print("Id: ");
         String id = sc.nextLine();
-        System.out.println("PassWord: ");
+        System.out.print("Password: ");
         String password = sc.nextLine();
 
         try {
-            utilizadorAtual = this.model.autenticar(id, password);
-            if(!utilizadorAtual.getCasasAdmin().isEmpty()){
+            utilizadorAtual = controlador.utilizadores.autenticar(id, password);
+            if (!utilizadorAtual.getCasasAdmin().isEmpty()) {
                 menuAdministrador();
-            }else{
+            } else {
                 menuUtilizador();
             }
         } catch (UtilizadorNaoEncontradoException e) {
-            System.out.println("Erro: Utilizador Nao Encontrado!");
-        } catch (PasswordIncorretaException e){
-            System.out.println("Erro: Password Incorreta!");
+            System.out.println("Erro: " + e.getMessage());
+        } catch (PasswordIncorretaException e) {
+            System.out.println("Erro: " + e.getMessage());
         }
     }
 
-    // preciso que implementem as mensagem exception 
-
-    private void NovoUtilizador(){
-        System.out.println("Insira o Id do Utilizador: ");
+    private void novoUtilizador() {
+        System.out.print("Id do utilizador: ");
         String id = sc.nextLine();
-        System.out.println("Insira a password do Utilizador: ");
+        System.out.print("Password: ");
         String password = sc.nextLine();
-        
+
         try {
-            this.model.criarUtilizador(id, password);
+            controlador.utilizadores.criar(id, password);
+            System.out.println("Utilizador criado com sucesso!");
         } catch (UtilizadorJaExisteException e) {
-            System.out.println("Erro: Utilizador Já Existe!");
+            System.out.println("Erro: " + e.getMessage());
         }
     }
 
-    //Menu Administrador 
+    // -------------------------------------------------------------------------
+    // Menu Administrador
+    // -------------------------------------------------------------------------
 
-    private void menuAdministrador(){
-        NewMenu menuAd = new NewMenu(new String[] {"Criar Casa","Gerir Casa","Apagar Casa"});
-        menuAd.setPreCondition(2,  () -> !utilizadorAtual.getCasasAdmin().isEmpty());
-        menuAd.setPreCondition(3,  () -> !utilizadorAtual.getCasasAdmin().isEmpty());
-        menuAd.setHandler(1, () -> criaCasaAdmin());
-        menuAd.setHandler(2, () -> modificaCasaAdmin());
-        menuAd.setHandler(3, () -> apagaCasasAdmin());
-
-        menuAd.run();
+    private void menuAdministrador() {
+        NewMenu menu = new NewMenu(new String[] {
+                "Criar Casa",
+                "Gerir Casa",
+                "Aceder como utilizador"
+        });
+        menu.setPreCondition(2, () -> !utilizadorAtual.getCasasAdmin().isEmpty());
+        menu.setPreCondition(3, () -> !utilizadorAtual.getCasasAcessiveis().isEmpty());
+        menu.setHandler(1, () -> criarCasa());
+        menu.setHandler(2, () -> escolherCasaAdmin());
+        menu.setHandler(3, () -> menuUtilizador());
+        menu.run();
     }
 
-    private void criaCasaAdmin(){
-        System.out.println("Morada da casa: ");
+    private void criarCasa() {
+        System.out.print("Id da casa: ");
+        String idCasa = sc.nextLine();
+        System.out.print("Morada: ");
         String morada = sc.nextLine();
-        System.out.println("Nome da casa: ");
-        String nomeCasa = sc.nextLine();
 
-    try {
-        // utilizadorAtual é o dono
-        this.model.criarCasa(nomeCasa,morada,utilizadorAtual.getId());
-        System.out.println("Casa criada com sucesso!");
-        } catch (UtilizadorNaoEncontradoException e) {
-            System.out.println("Erro: Utilizador inválido");
+        try {
+            controlador.casas.criar(utilizadorAtual.getId(), idCasa, morada);
+            // refrescar o utilizador atual para ter a nova casa
+            utilizadorAtual = controlador.utilizadores.autenticar(
+                    utilizadorAtual.getId(), utilizadorAtual.getPassword());
+            System.out.println("Casa criada com sucesso!");
         } catch (CasaJaExisteException e) {
-            System.out.println("Erro: Já existe uma casa com essa morada!");
+            System.out.println("Erro: " + e.getMessage());
+        } catch (UtilizadorNaoEncontradoException | PasswordIncorretaException e) {
+            System.out.println("Erro: " + e.getMessage());
         }
     }
 
-    private void modificaCasaAdmin(){
+    private void escolherCasaAdmin() {
         Set<String> casas = utilizadorAtual.getCasasAdmin();
-
         if (casas.isEmpty()) {
             System.out.println("Não tens casas para gerir.");
             return;
         }
 
-        List<String> listaCasas = new ArrayList<>(casas);
-
-        NewMenu menu = new NewMenu(listaCasas.toArray(new String[0]));
-
-        for (int i = 0; i < listaCasas.size(); i++) {
-            String nomeCasa = listaCasas.get(i);
+        List<String> lista = new ArrayList<>(casas);
+        NewMenu menu = new NewMenu(lista.toArray(new String[0]));
+        for (int i = 0; i < lista.size(); i++) {
+            String nomeCasa = lista.get(i);
             menu.setHandler(i + 1, () -> menuCasaAdmin(nomeCasa));
         }
-
         menu.run();
     }
 
-    private void menuCasaAdmin(String nomeCasa){
+    private void menuCasaAdmin(String idCasa) {
         NewMenu menu = new NewMenu(new String[] {
-            "Adicionar Divisão",
-            "Associar Dispositivo",
-            "Listar Dispositivos"
+                "Adicionar Divisão",
+                "Criar Dispositivo",
+                "Associar Dispositivo a Divisão",
+                "Listar Dispositivos",
+                "Adicionar Utilizador à Casa",
+                "Gerir Dispositivos",
+                "Criar Cenário",
+                "Ativar Cenário",
+                "Avançar Tempo",
+                "Estatísticas"
         });
-
-        menu.setHandler(1, () -> adicionarDivisao(nomeCasa));
-        menu.setHandler(2, () -> associarDispositivo(nomeCasa));
-        menu.setHandler(3, () -> listarDispositivos(nomeCasa));
-
+        menu.setHandler(1, () -> adicionarDivisao(idCasa));
+        menu.setHandler(2, () -> menuCriarDispositivo(idCasa));
+        menu.setHandler(3, () -> associarDispositivoADivisao(idCasa));
+        menu.setHandler(4, () -> listarDispositivos(idCasa));
+        menu.setHandler(5, () -> adicionarUtilizadorACasa(idCasa));
+        menu.setHandler(6, () -> menuGerirDispositivos(idCasa));
+        menu.setHandler(7, () -> criarCenario(idCasa));
+        menu.setHandler(8, () -> ativarCenario(idCasa));
+        menu.setHandler(9, () -> avancarTempo());
+        menu.setHandler(10, () -> menuEstatisticas(idCasa));
         menu.run();
     }
 
-    private void adicionarDivisao(String moradaCasa){
-        System.out.println("Nome da divisão:");
+    // -------------------------------------------------------------------------
+    // Divisões
+    // -------------------------------------------------------------------------
+
+    private void adicionarDivisao(String idCasa) {
+        System.out.print("Nome da divisão: ");
+        String nomeDiv = sc.nextLine();
+        try {
+            controlador.divisoes.adicionar(utilizadorAtual.getId(), idCasa, nomeDiv);
+            System.out.println("Divisão adicionada com sucesso!");
+        } catch (DivisaoJaExisteException | PermissaoNegadaException e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Criar dispositivo
+    // -------------------------------------------------------------------------
+
+    private void menuCriarDispositivo(String idCasa) {
+        NewMenu menu = new NewMenu(new String[] {
+                "Lâmpada",
+                "Lâmpada Colorida",
+                "Coluna de Som",
+                "Portoide"
+        });
+        menu.setHandler(1, () -> criarDispositivo(idCasa, "Lampada"));
+        menu.setHandler(2, () -> criarDispositivo(idCasa, "LampadaColorida"));
+        menu.setHandler(3, () -> criarDispositivo(idCasa, "ColunaDeSom"));
+        menu.setHandler(4, () -> criarDispositivo(idCasa, "Portoide"));
+        menu.run();
+    }
+
+    private void criarDispositivo(String idCasa, String tipo) {
+        System.out.print("Id do dispositivo: ");
+        String id = sc.nextLine();
+        System.out.print("Marca: ");
+        String marca = sc.nextLine();
+        System.out.print("Modelo: ");
+        String modelo = sc.nextLine();
+        System.out.print("Consumo (Wh): ");
+        int consumo = lerInt();
+
+        try {
+            switch (tipo) {
+                case "Lampada" -> controlador.dispositivos.criarLampada(
+                        utilizadorAtual.getId(), idCasa, id, marca, modelo, consumo);
+                case "LampadaColorida" -> controlador.dispositivos.criarLampadaColorida(
+                        utilizadorAtual.getId(), idCasa, id, marca, modelo, consumo);
+                case "ColunaDeSom" -> controlador.dispositivos.criarColunaDeSom(
+                        utilizadorAtual.getId(), idCasa, id, marca, modelo, consumo);
+                case "Portoide" -> controlador.dispositivos.criarPortoide(
+                        utilizadorAtual.getId(), idCasa, id, marca, modelo, consumo);
+            }
+            System.out.println("Dispositivo criado com sucesso!");
+        } catch (DispositivoJaExisteException | PermissaoNegadaException e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
+
+    private void associarDispositivoADivisao(String idCasa) {
+        System.out.print("Id do dispositivo: ");
+        String idDisp = sc.nextLine();
+        System.out.print("Nome da divisão: ");
         String nomeDiv = sc.nextLine();
 
         try {
-            model.adicionarDivisao(utilizadorAtual.getId(), moradaCasa, nomeDiv);
-            System.out.println("Divisão adicionada com sucesso!");
-        } catch (DivisaoJaExisteException e) {
-            System.out.println("Erro: Divisão já existe!");
+            controlador.dispositivos.associarADivisao(
+                    utilizadorAtual.getId(), idCasa, idDisp, nomeDiv);
+            System.out.println("Dispositivo associado!");
+        } catch (DispositivoNaoEncontradoException
+                | DivisaoNaoEncontradaException
+                | DispositivoJaAssociadoException
+                | PermissaoNegadaException e) {
+            System.out.println("Erro: " + e.getMessage());
         }
     }
 
-    private void associarDispositivo(String moradaCasa){
-
-    }
-
-    private void listarDispositivos(String moradaCasa){
-
-    }
-
-    private void apagaCasasAdmin(){
-        Set<String> casas = utilizadorAtual.getCasasAdmin();
-
-        if (casas.isEmpty()) {
-            System.out.println("Não tens casas para apagar!.");
-            return;
+    private void listarDispositivos(String idCasa) {
+        try {
+            Casa casa = obterCasa(idCasa);
+            Map<String, Dispositivo> dispositivos = casa.getDispositivos();
+            if (dispositivos.isEmpty()) {
+                System.out.println("Esta casa não tem dispositivos.");
+                return;
+            }
+            for (Dispositivo d : dispositivos.values()) {
+                System.out.println("---");
+                System.out.println(d);
+            }
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
         }
+    }
 
-        List<String> listaCasas = new ArrayList<>(casas);
+    private void adicionarUtilizadorACasa(String idCasa) {
+        System.out.print("Id do utilizador a adicionar: ");
+        String idUtil = sc.nextLine();
 
-        NewMenu menu = new NewMenu(listaCasas.toArray(new String[0]));
-
-        for (int i = 0; i < listaCasas.size(); i++) {
-            String nomeCasa = listaCasas.get(i);
-            menu.setHandler(i + 1, () -> apagarCasa(nomeCasa));
+        try {
+            controlador.casas.adicionarUtilizador(utilizadorAtual.getId(), idUtil, idCasa);
+            System.out.println("Utilizador adicionado à casa!");
+        } catch (UtilizadorNaoEncontradoException
+                | UtilizadorJaExisteException
+                | PermissaoNegadaException e) {
+            System.out.println("Erro: " + e.getMessage());
         }
-
-        menu.run();
     }
 
-    private void apagarCasa(String nomeCasa){
-        //preciso do apagarCasa do controlador 
-    }
+    // -------------------------------------------------------------------------
+    // Menu Utilizador (não administrador)
+    // -------------------------------------------------------------------------
 
-
-    // Menu Utilizador
-    private void menuUtilizador(){
+    private void menuUtilizador() {
         Set<String> casas = utilizadorAtual.getCasasAcessiveis();
-
         if (casas.isEmpty()) {
-            System.out.println("Não tens casas para gerir.");
+            System.out.println("Não tens casas acessíveis.");
             return;
         }
 
-        List<String> listaCasas = new ArrayList<>(casas);
-
-        NewMenu menu = new NewMenu(listaCasas.toArray(new String[0]));
-
-        for (int i = 0; i < listaCasas.size(); i++) {
-            String nomeCasa = listaCasas.get(i);
-            menu.setHandler(i + 1, () -> menuCasaUtilizador(nomeCasa));
+        List<String> lista = new ArrayList<>(casas);
+        NewMenu menu = new NewMenu(lista.toArray(new String[0]));
+        for (int i = 0; i < lista.size(); i++) {
+            String idCasa = lista.get(i);
+            menu.setHandler(i + 1, () -> menuCasaUtilizador(idCasa));
         }
-
         menu.run();
     }
 
-    private void menuCasaUtilizador(String nomeCasa){
+    private void menuCasaUtilizador(String idCasa) {
         NewMenu menu = new NewMenu(new String[] {
-            "Gerir Dispositivos",
-            "Ativar Cenário",
-            "Avançar Tempo"
+                "Gerir Dispositivos",
+                "Ativar Cenário",
+                "Avançar Tempo",
+                "Listar Dispositivos"
         });
-
-        menu.setHandler(1, () -> nemuGerirDispositivos(nomeCasa));
-        menu.setHandler(2, () -> ativarCenario(nomeCasa));
-        menu.setHandler(3, () -> tempoInput(nomeCasa));
-
+        menu.setHandler(1, () -> menuGerirDispositivos(idCasa));
+        menu.setHandler(2, () -> ativarCenario(idCasa));
+        menu.setHandler(3, () -> avancarTempo());
+        menu.setHandler(4, () -> listarDispositivos(idCasa));
         menu.run();
-
     }
-    
-    private void ativarCenario(String nomeCasa){}
 
-    private void tempoInput(String nomeCasa){}
+    // -------------------------------------------------------------------------
+    // Operar dispositivos
+    // -------------------------------------------------------------------------
 
-    private void nemuGerirDispositivos(String nomeCasa){
+    private void menuGerirDispositivos(String idCasa) {
         NewMenu menu = new NewMenu(new String[] {
-            "Ver os dispositivos da casa",
-            "Ligar dispositivo",
-            "Desligar dispositivo"
+                "Ligar dispositivo",
+                "Desligar dispositivo",
+                "Ajustar luminosidade (Lâmpada)",
+                "Ajustar cor (Lâmpada Colorida)",
+                "Ajustar volume (Coluna)",
+                "Ajustar abertura (Portoide)",
+                "Abrir portão",
+                "Fechar portão"
         });
-
-        menu.setHandler(1, () -> verDispositivosCasa(nomeCasa));
-        menu.setHandler(2, () -> ligarDispositivo(nomeCasa));
-        menu.setHandler(3, () -> desligarDispositivo(nomeCasa));
-
+        menu.setHandler(1, () -> ligarDispositivo(idCasa));
+        menu.setHandler(2, () -> desligarDispositivo(idCasa));
+        menu.setHandler(3, () -> ajustarLuminosidade(idCasa));
+        menu.setHandler(4, () -> ajustarCor(idCasa));
+        menu.setHandler(5, () -> ajustarVolume(idCasa));
+        menu.setHandler(6, () -> ajustarAbertura(idCasa));
+        menu.setHandler(7, () -> abrirPortao(idCasa));
+        menu.setHandler(8, () -> fecharPortao(idCasa));
         menu.run();
     }
 
-    private void verDispositivosCasa(String nomeCasa){
-        Map<String, Dispositivo> dispositivos = model.getDispositivosDaCasa(nomeCasa);
-
-        for (Dispositivo d : dispositivos.values()) {
-        System.out.println(d);
+    private void ligarDispositivo(String idCasa) {
+        System.out.print("Id do dispositivo: ");
+        String id = sc.nextLine();
+        try {
+            controlador.dispositivos.ligar(idCasa, id);
+            System.out.println("Dispositivo ligado.");
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
         }
     }
 
-    private void ligarDispositivo(String nomeCasa){}
+    private void desligarDispositivo(String idCasa) {
+        System.out.print("Id do dispositivo: ");
+        String id = sc.nextLine();
+        try {
+            controlador.dispositivos.desligar(idCasa, id);
+            System.out.println("Dispositivo desligado.");
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
 
-    private void desligarDispositivo(String nomeCasa){}
+    private void ajustarLuminosidade(String idCasa) {
+        System.out.print("Id do dispositivo: ");
+        String id = sc.nextLine();
+        System.out.print("Luminosidade (0-100): ");
+        int v = lerInt();
+        try {
+            controlador.dispositivos.ajustarLuminosidade(idCasa, id, v);
+            System.out.println("Luminosidade ajustada.");
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
 
+    private void ajustarCor(String idCasa) {
+        System.out.print("Id do dispositivo: ");
+        String id = sc.nextLine();
+        System.out.print("Cor: ");
+        String cor = sc.nextLine();
+        try {
+            controlador.dispositivos.ajustarCor(idCasa, id, cor);
+            System.out.println("Cor ajustada.");
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
 
+    private void ajustarVolume(String idCasa) {
+        System.out.print("Id do dispositivo: ");
+        String id = sc.nextLine();
+        System.out.print("Volume (0-100): ");
+        int v = lerInt();
+        try {
+            controlador.dispositivos.ajustarVolume(idCasa, id, v);
+            System.out.println("Volume ajustado.");
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
+
+    private void ajustarAbertura(String idCasa) {
+        System.out.print("Id do dispositivo: ");
+        String id = sc.nextLine();
+        System.out.print("Abertura (0-100): ");
+        int v = lerInt();
+        try {
+            controlador.dispositivos.ajustarAbertura(idCasa, id, v);
+            System.out.println("Abertura ajustada.");
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
+
+    private void abrirPortao(String idCasa) {
+        System.out.print("Id do portão: ");
+        String id = sc.nextLine();
+        try {
+            controlador.dispositivos.abrirPortao(idCasa, id);
+            System.out.println("Portão aberto.");
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
+
+    private void fecharPortao(String idCasa) {
+        System.out.print("Id do portão: ");
+        String id = sc.nextLine();
+        try {
+            controlador.dispositivos.fecharPortao(idCasa, id);
+            System.out.println("Portão fechado.");
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Cenários
+    // -------------------------------------------------------------------------
+
+    private void criarCenario(String idCasa) {
+        System.out.print("Nome do cenário: ");
+        String nome = sc.nextLine();
+        // versão simples: cenário vazio. A View pode ser estendida para permitir
+        // adicionar ações ao cenário interactivamente.
+        try {
+            controlador.cenarios.criar(utilizadorAtual.getId(), idCasa, nome, new HashSet<>());
+            System.out.println("Cenário criado (sem ações). Adiciona ações editando o cenário.");
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
+
+    private void ativarCenario(String idCasa) {
+        System.out.print("Nome do cenário: ");
+        String nome = sc.nextLine();
+        try {
+            controlador.cenarios.ativar(idCasa, nome);
+            System.out.println("Cenário ativado.");
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Tempo e Estatísticas
+    // -------------------------------------------------------------------------
+
+    private void avancarTempo() {
+        System.out.print("Avançar quantos minutos: ");
+        int min = lerInt();
+        controlador.avancarTempo(min);
+        System.out.println("Tempo atual: " + controlador.getTempoAtual());
+    }
+
+    private void menuEstatisticas(String idCasa) {
+        NewMenu menu = new NewMenu(new String[] {
+                "Casa que mais consome",
+                "Top 3 dispositivos por tempo",
+                "Top 3 dispositivos por ativações",
+                "Top 3 divisões com mais dispositivos"
+        });
+        menu.setHandler(1, () -> {
+            try {
+                System.out.println(controlador.estatisticas.casaQueMaisConsome());
+            } catch (Exception e) {
+                System.out.println("Erro: " + e.getMessage());
+            }
+        });
+        menu.setHandler(2, () -> {
+            try {
+                controlador.estatisticas.tresDispositivosMaisUtilizadosPorTempo(idCasa)
+                        .forEach(d -> System.out.println("---\n" + d));
+            } catch (Exception e) {
+                System.out.println("Erro: " + e.getMessage());
+            }
+        });
+        menu.setHandler(3, () -> {
+            try {
+                controlador.estatisticas.tresDispositivosMaisUtilizadosPorAtivacoes(idCasa)
+                        .forEach(d -> System.out.println("---\n" + d));
+            } catch (Exception e) {
+                System.out.println("Erro: " + e.getMessage());
+            }
+        });
+        menu.setHandler(4, () -> {
+            try {
+                controlador.estatisticas.tresDivisoesComMaisDispositivos()
+                        .forEach(d -> System.out.println("---\n" + d));
+            } catch (Exception e) {
+                System.out.println("Erro: " + e.getMessage());
+            }
+        });
+        menu.run();
+    }
+
+    // -------------------------------------------------------------------------
+    // Auxiliares
+    // -------------------------------------------------------------------------
+
+    private Casa obterCasa(String idCasa) {
+        // pequena utilidade para obter a Casa via Modelo (read-only)
+        return controlador.estatisticasGetCasa(idCasa);
+    }
+
+    private int lerInt() {
+        try {
+            return Integer.parseInt(sc.nextLine());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+        public static void main(String[] args) {
+        DomusControl modelo = new DomusControl();
+        Controlador controlador = new Controlador(modelo);
+        TextUI ui = new TextUI(controlador);
+        ui.run();
+    }
 }
