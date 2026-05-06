@@ -1,5 +1,7 @@
 package Model;
 
+import java.time.LocalDateTime;
+
 public class ColunaDeSom extends Dispositivo{
     private int volume;
 
@@ -7,17 +9,17 @@ public class ColunaDeSom extends Dispositivo{
 
     public ColunaDeSom(){
         super();
-        this.volume = 0;
+        this.volume = 75;
     }
 
     public ColunaDeSom(String id, String marca, String modelo, int consumo){
         super(id, marca, modelo, consumo);
-        this.volume = 0;
+        this.volume = 75;
     }
 
     public ColunaDeSom(ColunaDeSom col){
         super(col);
-        this.volume = 0;
+        this.volume = 75;
     }
 
     // --- Getters e Setters ---
@@ -30,10 +32,10 @@ public class ColunaDeSom extends Dispositivo{
         this.volume = volume;
     }
 
-    public void executarOperacao(String operacao, Object valor) {  
+    public void executarOperacao(LocalDateTime agora, String operacao, Object valor) {  
         switch (operacao) {
             case "setVolume" -> setVolume((int) valor);
-            default -> super.executarOperacao(operacao, valor);
+            default -> super.executarOperacao(agora, operacao, valor);
         }
     }
 

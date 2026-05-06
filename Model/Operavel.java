@@ -1,6 +1,8 @@
 package Model;
 
+import java.time.LocalDateTime;
+
 public interface Operavel {
-    void executarOperacao(String operacao, Object valor);
+    void executarOperacao(LocalDateTime agora, String operacao, Object valor);
     
 }

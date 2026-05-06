@@ -1,6 +1,7 @@
 package Model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -139,52 +140,52 @@ public class Casa implements Serializable{
 
     // --- Comportamentos ---
 
-    public void toggle(String dispositivo) {
-        this.dispositivos.get(dispositivo).toggle();
+    public void toggle(LocalDateTime agora, String dispositivo) {
+        this.dispositivos.get(dispositivo).toggle(agora);
     }
 
-    public void toggle(Set<String> dispositivos) {
-        dispositivos.forEach(disp ->  this.dispositivos.get(disp).toggle());
+    public void toggle(LocalDateTime agora, Set<String> dispositivos) {
+        dispositivos.forEach(disp ->  this.dispositivos.get(disp).toggle(agora));
     }
     
-    public void ligar(String dispositivo) {
-        this.dispositivos.get(dispositivo).ligar();
+    public void ligar(LocalDateTime agora, String dispositivo) {
+        this.dispositivos.get(dispositivo).ligar(agora);
     }
 
-    public void ligar(Set<String> dispositivos) {
-        dispositivos.forEach(disp ->  this.dispositivos.get(disp).ligar());
+    public void ligar(LocalDateTime agora, Set<String> dispositivos) {
+        dispositivos.forEach(disp ->  this.dispositivos.get(disp).ligar(agora));
     }
 
-    public void desligar(String dispositivo) {
-        this.dispositivos.get(dispositivo).desligar();
+    public void desligar(LocalDateTime agora, String dispositivo) {
+        this.dispositivos.get(dispositivo).desligar(agora);
     }
 
-    public void desligar(Set<String> dispositivos) {
-        dispositivos.forEach(disp ->  this.dispositivos.get(disp).desligar());
+    public void desligar(LocalDateTime agora, Set<String> dispositivos) {
+        dispositivos.forEach(disp ->  this.dispositivos.get(disp).desligar(agora));
     }
 
-    public void executarOperacao(String dispositivo, String operacao, Object valor) {
-        this.dispositivos.get(dispositivo).executarOperacao(operacao, valor);
+    public void executarOperacao(LocalDateTime agora, String dispositivo, String operacao, Object valor) {
+        this.dispositivos.get(dispositivo).executarOperacao(agora, operacao, valor);
     }
 
-    public void executarOperacao(Set<String> dispositivos, String operacao, Object valor) {
-        dispositivos.forEach(disp -> this.dispositivos.get(disp).executarOperacao(operacao, valor));
+    public void executarOperacao(LocalDateTime agora, Set<String> dispositivos, String operacao, Object valor) {
+        dispositivos.forEach(disp -> this.dispositivos.get(disp).executarOperacao(agora, operacao, valor));
     }
 
-    public void executarOperacao(AcaoDispositivo acao) {
-        this.dispositivos.get(acao.getIdDispositivo()).executarOperacao(acao.getOperacao(), acao.getValor());
+    public void executarOperacao(LocalDateTime agora, AcaoDispositivo acao) {
+        this.dispositivos.get(acao.getIdDispositivo()).executarOperacao(agora, acao.getOperacao(), acao.getValor());
     }
     
-    public void executarOperacao(AcaoMultiplosDispositivos acao) {
-        acao.getDispositivos().forEach(disp -> this.dispositivos.get(disp).executarOperacao(acao.getOperacao(), acao.getValor()));
+    public void executarOperacao(LocalDateTime agora, AcaoMultiplosDispositivos acao) {
+        acao.getDispositivos().forEach(disp -> this.dispositivos.get(disp).executarOperacao(agora, acao.getOperacao(), acao.getValor()));
     }
 
-    public void executarCenario(String cenario) {
+    public void executarCenario(LocalDateTime agora, String cenario) {
         cenarios.get(cenario).getAcoes().forEach(a -> {
                             if (a instanceof AcaoDispositivo ad)
-                                this.dispositivos.get(ad.getIdDispositivo()).executarOperacao(ad.getOperacao(), ad.getValor());
+                                this.dispositivos.get(ad.getIdDispositivo()).executarOperacao(agora, ad.getOperacao(), ad.getValor());
                             else if (a instanceof AcaoMultiplosDispositivos am)
-                                am.getDispositivos().forEach(disp -> this.dispositivos.get(disp).executarOperacao(am.getOperacao(), am.getValor()));
+                                am.getDispositivos().forEach(disp -> this.dispositivos.get(disp).executarOperacao(agora, am.getOperacao(), am.getValor()));
                         });
     }
     

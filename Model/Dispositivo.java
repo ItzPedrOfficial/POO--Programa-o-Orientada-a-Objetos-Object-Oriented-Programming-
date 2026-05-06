@@ -1,6 +1,8 @@
 package Model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 public class Dispositivo implements Serializable, Operavel {
     private String id;
@@ -8,6 +10,9 @@ public class Dispositivo implements Serializable, Operavel {
     private String modelo;
     private int consumo;
     private boolean ligado;
+    private int ativacoes;
+    private long tempoLigado;
+    private LocalDateTime ultimaVezLigado;
 
     // --- Construtores ---
     
@@ -20,6 +25,9 @@ public class Dispositivo implements Serializable, Operavel {
         this.modelo = "";
         this.consumo = 0;
         this.ligado = false;
+        this.ativacoes = 0;
+        this.tempoLigado = 0;
+        this.ultimaVezLigado = null;
     }
 
     /**
@@ -36,6 +44,9 @@ public class Dispositivo implements Serializable, Operavel {
         this.modelo = modelo;
         this.consumo = consumo;
         this.ligado = false;
+        this.ativacoes = 0;
+        this.tempoLigado = 0;
+        this.ultimaVezLigado = null;
     }
 
     /**
@@ -49,6 +60,9 @@ public class Dispositivo implements Serializable, Operavel {
         this.modelo = dis.getModelo();
         this.consumo = dis.getConsumo();
         this.ligado = false;
+        this.ativacoes = dis.getAtivacoes();
+        this.tempoLigado = dis.getTempoLigado();
+        this.ultimaVezLigado = dis.getUltimaVezLigado();
     }
 
     // --- Getters e Setters ---
@@ -93,34 +107,71 @@ public class Dispositivo implements Serializable, Operavel {
         this.ligado = ligado;
     }
 
+    public int getAtivacoes() {
+        return ativacoes;
+    }
+
+    public void setAtivacoes(int ativacoes) {
+        this.ativacoes = ativacoes;
+    }
+
+    public long getTempoLigado() {
+        return tempoLigado;
+    }
+
+    public void setTempoLigado(long tempoLigado) {
+        this.tempoLigado = tempoLigado;
+    }
+
+    public LocalDateTime getUltimaVezLigado() {
+        return ultimaVezLigado;
+    }
+
+    public void setUltimaVezLigado(LocalDateTime ultimaVezLigado) {
+        this.ultimaVezLigado = ultimaVezLigado;
+    }
+
     // --- Comportamentos ---
 
     /**
      * Liga o dispositivo se estiver desligado e desliga se estiver ligado
      */
-    public void toggle(){
+    public void toggle(LocalDateTime agora){
+        if (this.ligado && this.ultimaVezLigado != null) {
+            this.tempoLigado += ChronoUnit.MINUTES.between(ultimaVezLigado, agora);
+        } else {
+            ativacoes++;
+            ultimaVezLigado = agora;
+        }
         this.ligado = !this.ligado;
     }
 
     /**
      * Liga o dispositivo
      */
-    public void ligar(){
+    public void ligar(LocalDateTime agora){
+        if (!ligado) {
+            ativacoes++;
+            ultimaVezLigado = agora;
+        }
         this.ligado = true;
     }
 
     /**
      * Desliga o dispositivo
      */
-    public void desligar(){
+    public void desligar(LocalDateTime agora){
+        if (this.ligado && this.ultimaVezLigado != null) {
+            this.tempoLigado += ChronoUnit.MINUTES.between(ultimaVezLigado, agora);
+        }
         this.ligado = false;
     }
 
-    public void executarOperacao(String operacao, Object valor) {
+    public void executarOperacao(LocalDateTime agora, String operacao, Object valor) {
         switch (operacao) {
-            case "ligar" -> ligar();
-            case "desligar" -> desligar();
-            case "toggle" -> toggle();
+            case "ligar" -> ligar(agora);
+            case "desligar" -> desligar(agora);
+            case "toggle" -> toggle(agora);
         }
     }
 

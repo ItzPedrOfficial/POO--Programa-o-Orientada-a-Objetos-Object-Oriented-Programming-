@@ -1,5 +1,7 @@
 package Model;
 
+import java.time.LocalDateTime;
+
 public class LampadaColorida extends Lampada{
     private String cor;
 
@@ -17,7 +19,7 @@ public class LampadaColorida extends Lampada{
 
     public LampadaColorida(LampadaColorida lamp){
         super(lamp);
-        this.cor = "Branco";
+        this.cor = lamp.getCor();
     }
 
     // --- Getters e Setters ---
@@ -30,10 +32,10 @@ public class LampadaColorida extends Lampada{
         this.cor = cor;
     }
 
-    public void executarOperacao(String operacao, Object valor) {  
+    public void executarOperacao(LocalDateTime agora, String operacao, Object valor) {  
         switch (operacao) {
             case "setCor" -> setCor((String) valor);
-            default -> super.executarOperacao(operacao, valor);
+            default -> super.executarOperacao(agora, operacao, valor);
         }
     }
 

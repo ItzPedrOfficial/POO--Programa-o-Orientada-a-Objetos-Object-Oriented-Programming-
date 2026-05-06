@@ -1,5 +1,7 @@
 package Model;
 
+import java.time.LocalDateTime;
+
 public class Portoide extends Dispositivo{
     private int abertura;
 
@@ -30,10 +32,10 @@ public class Portoide extends Dispositivo{
         this.abertura = abertura;
     }
 
-    public void executarOperacao(String operacao, Object valor) {  
+    public void executarOperacao(LocalDateTime agora, String operacao, Object valor) {  
         switch (operacao) {
             case "setAbertura" -> setAbertura((int) valor);
-            default -> super.executarOperacao(operacao, valor);
+            default -> super.executarOperacao(agora, operacao, valor);
         }
     }
 

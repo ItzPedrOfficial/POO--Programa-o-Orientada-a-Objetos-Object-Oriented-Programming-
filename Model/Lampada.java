@@ -1,5 +1,7 @@
 package Model;
 
+import java.time.LocalDateTime;
+
 public class Lampada extends Dispositivo {
     private int luminosidade;
 
@@ -7,17 +9,17 @@ public class Lampada extends Dispositivo {
 
     public Lampada(){
         super();
-        this.luminosidade = 0;
+        this.luminosidade = 100;
     }
 
     public Lampada(String id, String marca, String modelo, int consumo){
         super(id, marca, modelo, consumo);
-        this.luminosidade = 0;
+        this.luminosidade = 100;
     }
 
     public Lampada(Lampada lamp){
         super(lamp);
-        this.luminosidade = 0;
+        this.luminosidade = 100;
     }
 
     // --- Getters e Setters ---
@@ -30,10 +32,10 @@ public class Lampada extends Dispositivo {
         this.luminosidade = luminosidade;
     }
 
-    public void executarOperacao(String operacao, Object valor) {  
+    public void executarOperacao(LocalDateTime agora, String operacao, Object valor) {  
         switch (operacao) {
             case "setLuminosidade" -> setLuminosidade((int) valor);
-            default -> super.executarOperacao(operacao, valor);
+            default -> super.executarOperacao(agora, operacao, valor);
         }
     }
 
