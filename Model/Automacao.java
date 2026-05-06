@@ -7,26 +7,26 @@ import java.util.stream.Collectors;
 
 public class Automacao implements Serializable {
     private String nome;
-    private Condicao condicao;
+    private String detetor;
     private Set<Acao> acoes;
 
     // --- Construtores ---
 
     public Automacao() {
         this.nome = "";
-        this.condicao = null;
+        this.detetor = "";
         this.acoes = new HashSet<>();
     }
 
-    public Automacao(String nome, Condicao condicao, Set<Acao> acoes) {
+    public Automacao(String nome, String detetor, Set<Acao> acoes) {
         this.nome = nome;
-        this.condicao = condicao;
+        this.detetor = detetor;
         this.acoes = new HashSet<>(acoes);
     }
 
     public Automacao(Automacao a) {
         this.nome = a.getNome();
-        this.condicao = a.getCondicao();
+        this.detetor = a.getDetetor();
         this.acoes = a.getAcoes();
     }
 
@@ -40,12 +40,12 @@ public class Automacao implements Serializable {
         this.nome = nome;
     }
 
-    public Condicao getCondicao() {
-        return condicao;
+    public String getDetetor() {
+        return detetor;
     }
 
-    public void setCondicao(Condicao condicao) {
-        this.condicao = condicao;
+    public void setDetetor(String detetor) {
+        this.detetor = detetor;
     }
 
     public Set<Acao> getAcoes() {
@@ -63,24 +63,31 @@ public class Automacao implements Serializable {
     // --- Overrides de Object ---
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || this.getClass() != o.getClass()) return false;
-        Automacao a = (Automacao) o;
-        return this.nome.equals(a.getNome()) &&
-               this.acoes.equals(a.getAcoes());
+    public boolean equals(Object o){
+        if (this == o)
+            return true;
+        
+        if (o == null || this.getClass() != o.getClass())
+            return false;
+        
+        Automacao automacao = (Automacao) o;
+        
+        return this.nome.equals(automacao.getNome()) &&
+               this.detetor.equals(automacao.getDetetor()) &&
+               this.acoes.equals(automacao.getAcoes());
     }
-
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Nome: ").append(nome).append("\n");
+        sb.append("Dispositivo detetor: ").append(detetor).append("\n");
         sb.append("Acoes: ").append(acoes.toString());
         return sb.toString();
     }
 
     @Override
-    public Automacao clone() {
+    public Automacao clone(){
         return new Automacao(this);
     }
 }

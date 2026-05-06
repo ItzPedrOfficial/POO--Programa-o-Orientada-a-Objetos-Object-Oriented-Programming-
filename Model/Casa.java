@@ -13,7 +13,8 @@ public class Casa implements Serializable{
     private Map<String, Dispositivo> dispositivos;
     private Map<String, Divisao> divisoes;
     private Map<String, Cenario> cenarios;
-       private Map<String, Automacao> automacoes; //Pedro
+    private Map<String, Automacao> automacoes;
+    private Map<String, Escalonamento> escalonamentos;
 
     // --- Construtores ---
 
@@ -23,10 +24,11 @@ public class Casa implements Serializable{
         this.dispositivos = new HashMap<>();
         this.divisoes = new HashMap<>();
         this.cenarios = new HashMap<>();
-        this.automacoes = new HashMap<>();//Pedro
+        this.automacoes = new HashMap<>();
+        this.escalonamentos = new HashMap<>();
     }
 
-    public Casa(String id, String morada, Map<String, Dispositivo> dispositivos, Map<String, Divisao> divisoes, Map<String, Cenario> cenarios) {
+    public Casa(String id, String morada, Map<String, Dispositivo> dispositivos, Map<String, Divisao> divisoes, Map<String, Cenario> cenarios, Map<String, Automacao> automacoes, Map<String, Escalonamento> escalonamentos) {
         this.id = id;
         this.morada = morada;
         this.dispositivos = dispositivos.values().stream()
@@ -38,8 +40,12 @@ public class Casa implements Serializable{
         this.cenarios = cenarios.values().stream()
                                          .map(Cenario::clone)
                                          .collect(Collectors.toMap(c -> c.getNome(), c -> c));
-        this.automacoes = new HashMap<>();
-       
+        this.automacoes = automacoes.values().stream()
+                                             .map(Automacao::clone)
+                                             .collect(Collectors.toMap(c -> c.getNome(), c -> c));
+        this.escalonamentos = escalonamentos.values().stream()
+                                                    .map(Escalonamento::clone)
+                                                    .collect(Collectors.toMap(e -> e.getNome(), e -> e));
     }
 
     public Casa(Casa casa) {
@@ -49,6 +55,7 @@ public class Casa implements Serializable{
         this.divisoes = casa.getDivisoes();
         this.cenarios = casa.getCenarios();
         this.automacoes = casa.getAutomacoes();
+        this.escalonamentos = casa.getEscalonamentos();
     }
 
     // --- Getters e Setters ---
@@ -104,7 +111,31 @@ public class Casa implements Serializable{
                                          .map(Cenario::clone)
                                          .collect(Collectors.toMap(c -> c.getNome(), c -> c));
     }
+
+    public Map<String, Automacao> getAutomacoes() {
+        return automacoes.values().stream()
+                                  .map(Automacao::clone)
+                                  .collect(Collectors.toMap(a -> a.getNome(), a -> a));
+    }
     
+    public void setAutomacoes(Map<String, Automacao> automacoes) {
+        this.automacoes = automacoes.values().stream()
+                                             .map(Automacao::clone)
+                                             .collect(Collectors.toMap(c -> c.getNome(), c -> c));
+    }
+    
+    public Map<String, Escalonamento> getEscalonamentos() {
+        return escalonamentos.values().stream()
+                                    .map(Escalonamento::clone)
+                                    .collect(Collectors.toMap(e -> e.getNome(), e -> e));
+    }
+
+    public void setEscalonamentos(Map<String, Escalonamento> escalonamentos) {
+        this.escalonamentos = escalonamentos.values().stream()
+                                                    .map(Escalonamento::clone)
+                                                    .collect(Collectors.toMap(e -> e.getNome(), e -> e));
+    }
+
     // --- Adds e Removes ---
 
     public void addDispositivo(String id, String marca, String modelo, int consumo){
@@ -119,6 +150,7 @@ public class Casa implements Serializable{
         this.dispositivos.remove(id);
     }
 
+
     public void addDivisao(String nome, Set<String> dispositivos) {
         this.divisoes.put(nome, new Divisao(nome, dispositivos));
     }
@@ -130,6 +162,7 @@ public class Casa implements Serializable{
     public void removeDivisao(String nome) {
         this.divisoes.remove(nome);
     }
+
 
     public void addCenario(String nome, Set<Acao> acoes) {
         this.cenarios.put(nome, new Cenario(nome, acoes));
@@ -143,39 +176,26 @@ public class Casa implements Serializable{
         this.cenarios.remove(nome);
     }
 
+
+    public void addAutomacao(String nome, Set<Acao> acoes, String detetor) {
+        this.automacoes.put(nome, new Automacao(nome, detetor, acoes));
+    }
+
     public void addAutomacao(Automacao automacao) {
-    this.automacoes.put(automacao.getNome(), automacao.clone());
+        this.automacoes.put(automacao.getNome(), automacao.clone());
     }
 
     public void removeAutomacao(String nome) {
-    this.automacoes.remove(nome);
-    }
-    
-
-    public Automacao getAutomacao(String nome) {
-    Automacao a = this.automacoes.get(nome);
-    return a == null ? null : a.clone();
+        this.automacoes.remove(nome);
     }
 
-    public void verificarEExecutarAutomacoes(LocalDateTime agora) {
-    for (Automacao a : this.automacoes.values()) {
-        if (a.getCondicao() != null && a.getCondicao().verificar()) {
-            for (Acao acao : a.getAcoes()) {
-                if (acao instanceof AcaoDispositivo ad)
-                    this.executarOperacao(agora, ad);
-                else if (acao instanceof AcaoMultiplosDispositivos am)
-                    this.executarOperacao(agora, am);
-             }
-        }
-        }
+    public void addEscalonamento(Escalonamento escalonamento) {
+        this.escalonamentos.put(escalonamento.getNome(), escalonamento.clone());
     }
 
-    public Map<String, Automacao> getAutomacoes() {
-    return automacoes.values().stream()
-                              .map(Automacao::clone)
-                              .collect(Collectors.toMap(a -> a.getNome(), a -> a));
+    public void removeEscalonamento(String nome) {
+        this.escalonamentos.remove(nome);
     }
-
 
     // --- Comportamentos ---
 
@@ -220,13 +240,39 @@ public class Casa implements Serializable{
     }
 
     public void executarCenario(LocalDateTime agora, String cenario) {
-        cenarios.get(cenario).getAcoes().forEach(a -> {
+        this.cenarios.get(cenario).getAcoes().forEach(a -> {
                             if (a instanceof AcaoDispositivo ad)
                                 this.dispositivos.get(ad.getIdDispositivo()).executarOperacao(agora, ad.getOperacao(), ad.getValor());
                             else if (a instanceof AcaoMultiplosDispositivos am)
                                 am.getDispositivos().forEach(disp -> this.dispositivos.get(disp).executarOperacao(agora, am.getOperacao(), am.getValor()));
                         });
     }
+
+    public void atualizarAutomacoes(LocalDateTime agora) {
+        this.automacoes.values().stream()
+                                .forEach(aut -> {
+                                    Detetor det = (Detetor) this.dispositivos.get(aut.getDetetor());
+                                    if (det.isADetetar()) {
+                                        aut.getAcoes().forEach(a -> {
+                                                        if (a instanceof AcaoDispositivo ad)
+                                                            this.dispositivos.get(ad.getIdDispositivo()).executarOperacao(agora, ad.getOperacao(), ad.getValor());
+                                                        else if (a instanceof AcaoMultiplosDispositivos am)
+                                                            am.getDispositivos().forEach(disp -> this.dispositivos.get(disp).executarOperacao(agora, am.getOperacao(), am.getValor()));
+                                                        });
+                                    }});
+    }
+
+    public void atualizarEscalonamentos(LocalDateTime agora) {
+        this.escalonamentos.values().stream()
+                                    .filter(e -> e.deveExecutar(agora))
+                                    .forEach(e -> e.getAcoes().forEach(a -> {
+                                        if (a instanceof AcaoDispositivo ad)
+                                            this.dispositivos.get(ad.getIdDispositivo()).executarOperacao(agora, ad.getOperacao(), ad.getValor());
+                                        else if (a instanceof AcaoMultiplosDispositivos am)
+                                            am.getDispositivos().forEach(disp -> this.dispositivos.get(disp).executarOperacao(agora, am.getOperacao(), am.getValor()));
+                                    }));
+    }
+
     
     public int quantosDispositivos() {
         return (int) this.dispositivos.values().stream()
@@ -243,28 +289,46 @@ public class Casa implements Serializable{
                                   .count();
     }
 
-    public Dispositivo getDispositivo(String dispositivo) { //Pedro, alterado para nao crashar
-    Dispositivo d = this.dispositivos.get(dispositivo);
-    return d == null ? null : d.clone();
+    public int quantasAutomacoes() {
+        return (int) this.automacoes.values().stream()
+                                    .count();
+    }
+
+    public int quantosEscalonamentos() {
+        return this.escalonamentos.size();
+    }
+
+    public Dispositivo getDispositivo(String dispositivo) {
+        Dispositivo d = this.dispositivos.get(dispositivo);
+        return d == null ? null : d.clone();
     }
 
     public Divisao getDivisao(String divisao) {
-    Divisao d = this.divisoes.get(divisao);
-    return d == null ? null : d.clone();
+        Divisao d = this.divisoes.get(divisao);
+        return d == null ? null : d.clone();
     }
 
     public Cenario getCenario(String cenario) {
-    Cenario c = this.cenarios.get(cenario);
-    return c == null ? null : c.clone();
+        Cenario c = this.cenarios.get(cenario);
+        return c == null ? null : c.clone();
     }
 
     public int getConsumoTotal() {
-    return this.dispositivos.values().stream()
-            .filter(Dispositivo::isLigado)
-            .mapToInt(Dispositivo::getConsumo)
-            .sum();
+        return this.dispositivos.values().stream()
+                .filter(Dispositivo::isLigado)
+                .mapToInt(Dispositivo::getConsumo)
+                .sum();
     }
 
+    public Automacao getAutomacao(String nome) {
+        Automacao a = this.automacoes.get(nome);
+        return a == null ? null : a.clone();
+    }
+
+    public Escalonamento getEscalonamento(String nome) {
+        Escalonamento e = this.escalonamentos.get(nome);
+        return e == null ? null : e.clone();
+    }
 
     // --- Overrides de Object ---
     

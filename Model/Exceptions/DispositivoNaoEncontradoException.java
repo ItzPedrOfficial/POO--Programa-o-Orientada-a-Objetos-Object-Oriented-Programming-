@@ -1,0 +1,5 @@
+package Model.Exceptions;
+
+public class DispositivoNaoEncontradoException extends Exception {
+    public DispositivoNaoEncontradoException(String msg) { super(msg); }
+}

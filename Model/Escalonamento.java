@@ -12,9 +12,6 @@ public abstract class Escalonamento implements Serializable{
     private Set<Acao> acoes;
     private LocalTime inicio;
     private LocalTime fim;
-    // private LocalTime hora;
-    // private DayOfWeek diaSemana;
-    // private LocalDate data;
 
     // --- Construtores ---
 
