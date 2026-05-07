@@ -14,7 +14,7 @@ import java.util.Set;
 public class Controlador {
 
     private DomusControl modelo;
-    private String utilizadorAtual;
+    
 
     // -------------------------------------------------------------------------
     // Construtor
