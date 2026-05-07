@@ -270,7 +270,8 @@ public class Controlador {
     public Casa getCasaQueMaisConsome() {
         return modelo.casaQueMaisConsome();
     }
-
+    
+// Isto não pode estar aqui
     public List<Dispositivo> getTresDispositivosMaisUtilizadosPorTempo(String idUtilizador, String idCasa)
             throws PermissaoNegadaException, CasaNaoEncontradaException, UtilizadorNaoEncontradoException {
         List<Dispositivo> dispositivos = new ArrayList<>(modelo.getCasa(idUtilizador, idCasa).getDispositivos().values());
