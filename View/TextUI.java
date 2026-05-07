@@ -40,11 +40,7 @@ public class TextUI {
 
         try {
             utilizadorAtual = controlador.autenticar(id, password);
-            if (!utilizadorAtual.getCasasAdmin().isEmpty()) {
-                menuAdministrador();
-            } else {
-                menuUtilizador();
-            }
+            menuAdministrador();
         } catch (UtilizadorNaoEncontradoException e) {
             System.out.println("Erro: " + e.getMessage());
         } catch (PasswordIncorretaException e) {
