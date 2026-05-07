@@ -476,7 +476,7 @@ public class TextUI {
         });
         menu.setHandler(4, () -> {
             try {
-                controlador.getTresDivisoesComMaisDispositivos()
+                controlador.getTresDivisoesComMaisDispositivos(utilizadorAtual.getId(), idCasa)
                         .forEach(d -> System.out.println("---\n" + d));
             } catch (Exception e) {
                 System.out.println("Erro: " + e.getMessage());
