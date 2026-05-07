@@ -263,7 +263,6 @@ public class Controlador {
                    CasaNaoEncontradaException, EscalonamentoNaoEncontradoException {
         return modelo.getEscalonamento(idUtilizador, idCasa, nomeEscalonamento);
     }
-
     // -------------------------------------------------------------------------
     // Estatísticas
     // -------------------------------------------------------------------------
@@ -271,31 +270,21 @@ public class Controlador {
     public Casa getCasaQueMaisConsome() {
         return modelo.casaQueMaisConsome();
     }
-    
-// Isto não pode estar aqui
+
     public List<Dispositivo> getTresDispositivosMaisUtilizadosPorTempo(String idUtilizador, String idCasa)
             throws PermissaoNegadaException, CasaNaoEncontradaException, UtilizadorNaoEncontradoException {
-        List<Dispositivo> dispositivos = new ArrayList<>(modelo.getCasa(idUtilizador, idCasa).getDispositivos().values());
-        dispositivos.sort((d1, d2) -> Long.compare(d2.getTempoLigado(), d1.getTempoLigado()));
-        return dispositivos.subList(0, Math.min(3, dispositivos.size()));
+        return modelo.getTresDispositivosMaisUtilizadosPorTempo(idUtilizador, idCasa);
     }
 
     public List<Dispositivo> getTresDispositivosMaisUtilizadosPorAtivacoes(String idUtilizador, String idCasa)
             throws PermissaoNegadaException, CasaNaoEncontradaException, UtilizadorNaoEncontradoException {
-        List<Dispositivo> dispositivos = new ArrayList<>(modelo.getCasa(idUtilizador, idCasa).getDispositivos().values());
-        dispositivos.sort((d1, d2) -> d2.getAtivacoes() - d1.getAtivacoes());
-        return dispositivos.subList(0, Math.min(3, dispositivos.size()));
+        return modelo.getTresDispositivosMaisUtilizadosPorAtivacoes(idUtilizador, idCasa);
     }
 
-    public List<Divisao> getTresDivisoesComMaisDispositivos() {
-        List<Casa> casas = new ArrayList<>(modelo.getCasas().values());
-        List<Divisao> divisoes = new ArrayList<>();
-        for (Casa c : casas)
-            divisoes.addAll(c.getDivisoes().values());
-        divisoes.sort((d1, d2) -> d2.getDispositivos().size() - d1.getDispositivos().size());
-        return divisoes.subList(0, Math.min(3, divisoes.size()));
+    public List<Divisao> getTresDivisoesComMaisDispositivos(String idUtilizador, String idCasa)
+            throws PermissaoNegadaException, UtilizadorNaoEncontradoException, CasaNaoEncontradaException {
+        return modelo.getTresDivisoesComMaisDispositivos(idUtilizador, idCasa);
     }
-
     // -------------------------------------------------------------------------
     // Persistência
     // -------------------------------------------------------------------------
