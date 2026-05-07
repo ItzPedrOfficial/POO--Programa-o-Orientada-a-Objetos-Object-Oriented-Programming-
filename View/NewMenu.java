@@ -4,7 +4,7 @@ import java.util.*;
 
 
 public class NewMenu {
-
+    private String titulo;
     // Interfaces auxiliares
 
     /** Functional interface para handlers. */
@@ -33,7 +33,8 @@ public class NewMenu {
     /**
      * Constructor for objects of class NewMenu
      */
-    public NewMenu(String[] opcoes) {
+    public NewMenu(String titulo,String[] opcoes) {
+        this.titulo = titulo;
         this.opcoes = Arrays.asList(opcoes);
         this.disponivel = new ArrayList<>();
         this.handlers = new ArrayList<>();
@@ -89,7 +90,10 @@ public class NewMenu {
 
     /** Apresentar o NewMenu */
     private void show() {
-        System.out.println("\n *** NewMenu *** ");
+        System.out.println("\n ╔══════════════════════════╗");
+        System.out.printf(" ║  %-24s║%n", titulo);
+        System.out.println(" ╚══════════════════════════╝\n");
+
         for (int i=0; i<this.opcoes.size(); i++) {
             System.out.print(i+1);
             System.out.print(" - ");
