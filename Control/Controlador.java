@@ -16,17 +16,15 @@ public class Controlador {
     private DomusControl modelo;
     
 
-    // -------------------------------------------------------------------------
+    
     // Construtor
-    // -------------------------------------------------------------------------
 
     public Controlador(DomusControl modelo) {
         this.modelo = modelo;
     }
 
-    // -------------------------------------------------------------------------
+    
     // Tempo
-    // -------------------------------------------------------------------------
 
     public void avancarTempo(int minutos) {
         modelo.avancarTempo(minutos);
@@ -38,9 +36,8 @@ public class Controlador {
         return modelo.getTempoAtual();
     }
 
-    // -------------------------------------------------------------------------
     // Utilizadores
-    // -------------------------------------------------------------------------
+   
 
     public void criarUtilizador(String id, String password)
             throws UtilizadorJaExisteException {
@@ -54,9 +51,9 @@ public class Controlador {
         return modelo.getUtilizador(id);
     }
 
-    // -------------------------------------------------------------------------
+    
     // Casas
-    // -------------------------------------------------------------------------
+
 
     public void criarCasa(String idUtilizador, String idCasa, String morada)
         throws UtilizadorNaoEncontradoException, CasaJaExisteException {
@@ -90,9 +87,9 @@ public class Controlador {
         modelo.addCasaAcessivelAUtilizador(idDono, idUtilizador, idCasa);
     }
 
-    // -------------------------------------------------------------------------
+    
     // Divisões
-    // -------------------------------------------------------------------------
+
 
     public void adicionarDivisao(String idUtilizador, String idCasa, String nomeDivisao)
             throws PermissaoNegadaException, CasaNaoEncontradaException, UtilizadorNaoEncontradoException {
@@ -110,9 +107,9 @@ public class Controlador {
         return modelo.getDivisao(idUtilizador, idCasa, nomeDivisao);
     }
 
-    // -------------------------------------------------------------------------
+   
     // Dispositivos — criação
-    // -------------------------------------------------------------------------
+
 
     public void criarLampada(String idUtilizador, String idCasa, String id, String marca, String nomeModelo, int consumo)
             throws PermissaoNegadaException, CasaNaoEncontradaException, UtilizadorNaoEncontradoException {
@@ -139,10 +136,8 @@ public class Controlador {
         modelo.addDispositivo(idUtilizador, idCasa, new Detetor(id, marca, nomeModelo, consumo));
     }
 
-    // -------------------------------------------------------------------------
     // Dispositivos — associar a divisão
-    // -------------------------------------------------------------------------
-
+   
     public void associarDispositivoADivisao(String idUtilizador, String idCasa, String idDispositivo, String nomeDivisao)
             throws PermissaoNegadaException, CasaNaoEncontradaException,
                    UtilizadorNaoEncontradoException, DivisaoNaoEncontradaException {
@@ -151,9 +146,8 @@ public class Controlador {
         modelo.addDivisao(idUtilizador, idCasa, divisao);
     }
 
-    // -------------------------------------------------------------------------
     // Dispositivos — operar
-    // -------------------------------------------------------------------------
+    
 
     public void ligarDispositivo(String idUtilizador, String idCasa, String idDispositivo)
             throws PermissaoNegadaException, CasaNaoEncontradaException, UtilizadorNaoEncontradoException {
@@ -205,9 +199,9 @@ public class Controlador {
         return modelo.getDispositivo(idUtilizador, idCasa, idDispositivo);
     }
 
-    // -------------------------------------------------------------------------
-    // Cenários
-    // -------------------------------------------------------------------------
+   
+    // Cenários...
+    
 
     public void criarCenario(String idUtilizador, String idCasa, String nomeCenario, Set<Acao> acoes)
             throws PermissaoNegadaException, CasaNaoEncontradaException, UtilizadorNaoEncontradoException {
@@ -225,9 +219,7 @@ public class Controlador {
         return modelo.getCenario(idUtilizador, idCasa, nomeCenario);
     }
 
-    // -------------------------------------------------------------------------
     // Automações
-    // -------------------------------------------------------------------------
 
     public void criarAutomacao(String idUtilizador, String idCasa, String nomeAutomacao, String idDetetor, Set<Acao> acoes)
         throws PermissaoNegadaException, CasaNaoEncontradaException, UtilizadorNaoEncontradoException {
@@ -239,9 +231,9 @@ public class Controlador {
         return modelo.getAutomacao(idUtilizador, idCasa, nomeAutomacao);
     }
 
-    // -------------------------------------------------------------------------
-    // Escalonamentos
-    // -------------------------------------------------------------------------
+ 
+    // Escalonamentos...
+  
 
     public void criarEscalonamentoDiario(String idUtilizador, String idCasa, String nome, Set<Acao> acoes, LocalTime inicio, LocalTime fim)
             throws PermissaoNegadaException, CasaNaoEncontradaException, UtilizadorNaoEncontradoException {
@@ -263,9 +255,9 @@ public class Controlador {
                    CasaNaoEncontradaException, EscalonamentoNaoEncontradoException {
         return modelo.getEscalonamento(idUtilizador, idCasa, nomeEscalonamento);
     }
-    // -------------------------------------------------------------------------
+   
+
     // Estatísticas
-    // -------------------------------------------------------------------------
 
     public Casa getCasaQueMaisConsome() {
         return modelo.casaQueMaisConsome();
@@ -285,10 +277,8 @@ public class Controlador {
             throws PermissaoNegadaException, UtilizadorNaoEncontradoException, CasaNaoEncontradaException {
         return modelo.getTresDivisoesComMaisDispositivos(idUtilizador, idCasa);
     }
-    // -------------------------------------------------------------------------
-    // Persistência
-    // -------------------------------------------------------------------------
 
+    // Persistência...
     public void guardarEstado(String caminhoFicheiro) throws IOException {
         modelo.guardar(caminhoFicheiro);
     }
