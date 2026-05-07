@@ -6,19 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-import static Control.Exceptions.*;
-
-import Control.*;
-import Control.Exceptions.CasaJaExisteException;
-import Control.Exceptions.DispositivoJaAssociadoException;
-import Control.Exceptions.DispositivoJaExisteException;
-import Control.Exceptions.DispositivoNaoEncontradoException;
-import Control.Exceptions.DivisaoJaExisteException;
-import Control.Exceptions.DivisaoNaoEncontradaException;
-import Control.Exceptions.PasswordIncorretaException;
-import Control.Exceptions.PermissaoNegadaException;
-import Control.Exceptions.UtilizadorJaExisteException;
-import Control.Exceptions.UtilizadorNaoEncontradoException;
+import Model.Exceptions.*;
+import Control.Controlador;
 import Model.*;
 
 public class TextUI {
@@ -50,7 +39,7 @@ public class TextUI {
         String password = sc.nextLine();
 
         try {
-            utilizadorAtual = controlador.utilizadores.autenticar(id, password);
+            utilizadorAtual = controlador.autenticar(id, password);
             if (!utilizadorAtual.getCasasAdmin().isEmpty()) {
                 menuAdministrador();
             } else {
@@ -70,7 +59,7 @@ public class TextUI {
         String password = sc.nextLine();
 
         try {
-            controlador.utilizadores.criar(id, password);
+            controlador.criarUtilizador(id, password);
             System.out.println("Utilizador criado com sucesso!");
         } catch (UtilizadorJaExisteException e) {
             System.out.println("Erro: " + e.getMessage());
@@ -102,9 +91,8 @@ public class TextUI {
         String morada = sc.nextLine();
 
         try {
-            controlador.casas.criar(utilizadorAtual.getId(), idCasa, morada);
-            // refrescar o utilizador atual para ter a nova casa
-            utilizadorAtual = controlador.utilizadores.autenticar(
+            controlador.criarCasa(utilizadorAtual.getId(), idCasa, morada);
+            utilizadorAtual = controlador.autenticar(
                     utilizadorAtual.getId(), utilizadorAtual.getPassword());
             System.out.println("Casa criada com sucesso!");
         } catch (CasaJaExisteException e) {
@@ -164,9 +152,9 @@ public class TextUI {
         System.out.print("Nome da divisão: ");
         String nomeDiv = sc.nextLine();
         try {
-            controlador.divisoes.adicionar(utilizadorAtual.getId(), idCasa, nomeDiv);
+            controlador.adicionarDivisao(utilizadorAtual.getId(), idCasa, nomeDiv);
             System.out.println("Divisão adicionada com sucesso!");
-        } catch (DivisaoJaExisteException | PermissaoNegadaException e) {
+        }  catch (PermissaoNegadaException | CasaNaoEncontradaException | UtilizadorNaoEncontradoException e) {
             System.out.println("Erro: " + e.getMessage());
         }
     }
@@ -180,12 +168,14 @@ public class TextUI {
                 "Lâmpada",
                 "Lâmpada Colorida",
                 "Coluna de Som",
-                "Portoide"
+                "Portoide",
+                "Detetor"
         });
         menu.setHandler(1, () -> criarDispositivo(idCasa, "Lampada"));
         menu.setHandler(2, () -> criarDispositivo(idCasa, "LampadaColorida"));
         menu.setHandler(3, () -> criarDispositivo(idCasa, "ColunaDeSom"));
         menu.setHandler(4, () -> criarDispositivo(idCasa, "Portoide"));
+        menu.setHandler(5, () -> criarDispositivo(idCasa, "Detetor"));
         menu.run();
     }
 
@@ -201,17 +191,20 @@ public class TextUI {
 
         try {
             switch (tipo) {
-                case "Lampada" -> controlador.dispositivos.criarLampada(
+                case "Lampada" -> controlador.criarLampada(
                         utilizadorAtual.getId(), idCasa, id, marca, modelo, consumo);
-                case "LampadaColorida" -> controlador.dispositivos.criarLampadaColorida(
+                case "LampadaColorida" -> controlador.criarLampadaColorida(
                         utilizadorAtual.getId(), idCasa, id, marca, modelo, consumo);
-                case "ColunaDeSom" -> controlador.dispositivos.criarColunaDeSom(
+                case "ColunaDeSom" -> controlador.criarColunaDeSom(
                         utilizadorAtual.getId(), idCasa, id, marca, modelo, consumo);
-                case "Portoide" -> controlador.dispositivos.criarPortoide(
+                case "Portoide" -> controlador.criarPortoide(
+                        utilizadorAtual.getId(), idCasa, id, marca, modelo, consumo);
+                case "Detetor" -> controlador.criarDetetor(
                         utilizadorAtual.getId(), idCasa, id, marca, modelo, consumo);
             }
             System.out.println("Dispositivo criado com sucesso!");
-        } catch (DispositivoJaExisteException | PermissaoNegadaException e) {
+        } catch (PermissaoNegadaException | CasaNaoEncontradaException |
+                 UtilizadorNaoEncontradoException e) {
             System.out.println("Erro: " + e.getMessage());
         }
     }
@@ -223,20 +216,18 @@ public class TextUI {
         String nomeDiv = sc.nextLine();
 
         try {
-            controlador.dispositivos.associarADivisao(
+            controlador.associarDispositivoADivisao(
                     utilizadorAtual.getId(), idCasa, idDisp, nomeDiv);
             System.out.println("Dispositivo associado!");
-        } catch (DispositivoNaoEncontradoException
-                | DivisaoNaoEncontradaException
-                | DispositivoJaAssociadoException
-                | PermissaoNegadaException e) {
+        } catch (DivisaoNaoEncontradaException | PermissaoNegadaException |
+                 CasaNaoEncontradaException | UtilizadorNaoEncontradoException e) {
             System.out.println("Erro: " + e.getMessage());
         }
     }
 
     private void listarDispositivos(String idCasa) {
         try {
-            Casa casa = obterCasa(idCasa);
+            Casa casa = controlador.getCasa(utilizadorAtual.getId(), idCasa);
             Map<String, Dispositivo> dispositivos = casa.getDispositivos();
             if (dispositivos.isEmpty()) {
                 System.out.println("Esta casa não tem dispositivos.");
@@ -256,17 +247,16 @@ public class TextUI {
         String idUtil = sc.nextLine();
 
         try {
-            controlador.casas.adicionarUtilizador(utilizadorAtual.getId(), idUtil, idCasa);
+            controlador.adicionarUtilizadorACasa(utilizadorAtual.getId(), idUtil, idCasa);
             System.out.println("Utilizador adicionado à casa!");
-        } catch (UtilizadorNaoEncontradoException
-                | UtilizadorJaExisteException
-                | PermissaoNegadaException e) {
+        } catch (UtilizadorNaoEncontradoException | PermissaoNegadaException |
+                 CasaNaoEncontradaException e) {
             System.out.println("Erro: " + e.getMessage());
         }
     }
 
     // -------------------------------------------------------------------------
-    // Menu Utilizador (não administrador)
+    // Menu Utilizador
     // -------------------------------------------------------------------------
 
     private void menuUtilizador() {
@@ -329,7 +319,7 @@ public class TextUI {
         System.out.print("Id do dispositivo: ");
         String id = sc.nextLine();
         try {
-            controlador.dispositivos.ligar(idCasa, id);
+            controlador.ligarDispositivo(utilizadorAtual.getId(), idCasa, id);
             System.out.println("Dispositivo ligado.");
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
@@ -340,7 +330,7 @@ public class TextUI {
         System.out.print("Id do dispositivo: ");
         String id = sc.nextLine();
         try {
-            controlador.dispositivos.desligar(idCasa, id);
+            controlador.desligarDispositivo(utilizadorAtual.getId(), idCasa, id);
             System.out.println("Dispositivo desligado.");
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
@@ -353,7 +343,7 @@ public class TextUI {
         System.out.print("Luminosidade (0-100): ");
         int v = lerInt();
         try {
-            controlador.dispositivos.ajustarLuminosidade(idCasa, id, v);
+            controlador.ajustarLuminosidade(utilizadorAtual.getId(), idCasa, id, v);
             System.out.println("Luminosidade ajustada.");
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
@@ -366,7 +356,7 @@ public class TextUI {
         System.out.print("Cor: ");
         String cor = sc.nextLine();
         try {
-            controlador.dispositivos.ajustarCor(idCasa, id, cor);
+            controlador.ajustarCor(utilizadorAtual.getId(), idCasa, id, cor);
             System.out.println("Cor ajustada.");
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
@@ -379,7 +369,7 @@ public class TextUI {
         System.out.print("Volume (0-100): ");
         int v = lerInt();
         try {
-            controlador.dispositivos.ajustarVolume(idCasa, id, v);
+            controlador.ajustarVolume(utilizadorAtual.getId(), idCasa, id, v);
             System.out.println("Volume ajustado.");
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
@@ -392,7 +382,7 @@ public class TextUI {
         System.out.print("Abertura (0-100): ");
         int v = lerInt();
         try {
-            controlador.dispositivos.ajustarAbertura(idCasa, id, v);
+            controlador.ajustarAbertura(utilizadorAtual.getId(), idCasa, id, v);
             System.out.println("Abertura ajustada.");
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
@@ -403,7 +393,7 @@ public class TextUI {
         System.out.print("Id do portão: ");
         String id = sc.nextLine();
         try {
-            controlador.dispositivos.abrirPortao(idCasa, id);
+            controlador.abrirPortao(utilizadorAtual.getId(), idCasa, id);
             System.out.println("Portão aberto.");
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
@@ -414,7 +404,7 @@ public class TextUI {
         System.out.print("Id do portão: ");
         String id = sc.nextLine();
         try {
-            controlador.dispositivos.fecharPortao(idCasa, id);
+            controlador.fecharPortao(utilizadorAtual.getId(), idCasa, id);
             System.out.println("Portão fechado.");
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
@@ -428,11 +418,9 @@ public class TextUI {
     private void criarCenario(String idCasa) {
         System.out.print("Nome do cenário: ");
         String nome = sc.nextLine();
-        // versão simples: cenário vazio. A View pode ser estendida para permitir
-        // adicionar ações ao cenário interactivamente.
         try {
-            controlador.cenarios.criar(utilizadorAtual.getId(), idCasa, nome, new HashSet<>());
-            System.out.println("Cenário criado (sem ações). Adiciona ações editando o cenário.");
+            controlador.criarCenario(utilizadorAtual.getId(), idCasa, nome, new HashSet<>());
+            System.out.println("Cenário criado com sucesso!");
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
         }
@@ -442,7 +430,7 @@ public class TextUI {
         System.out.print("Nome do cenário: ");
         String nome = sc.nextLine();
         try {
-            controlador.cenarios.ativar(idCasa, nome);
+            controlador.ativarCenario(utilizadorAtual.getId(), idCasa, nome);
             System.out.println("Cenário ativado.");
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
@@ -469,14 +457,14 @@ public class TextUI {
         });
         menu.setHandler(1, () -> {
             try {
-                System.out.println(controlador.estatisticas.casaQueMaisConsome());
+                System.out.println(controlador.getCasaQueMaisConsome());
             } catch (Exception e) {
                 System.out.println("Erro: " + e.getMessage());
             }
         });
         menu.setHandler(2, () -> {
             try {
-                controlador.estatisticas.tresDispositivosMaisUtilizadosPorTempo(idCasa)
+                controlador.getTresDispositivosMaisUtilizadosPorTempo(utilizadorAtual.getId(), idCasa)
                         .forEach(d -> System.out.println("---\n" + d));
             } catch (Exception e) {
                 System.out.println("Erro: " + e.getMessage());
@@ -484,7 +472,7 @@ public class TextUI {
         });
         menu.setHandler(3, () -> {
             try {
-                controlador.estatisticas.tresDispositivosMaisUtilizadosPorAtivacoes(idCasa)
+                controlador.getTresDispositivosMaisUtilizadosPorAtivacoes(utilizadorAtual.getId(), idCasa)
                         .forEach(d -> System.out.println("---\n" + d));
             } catch (Exception e) {
                 System.out.println("Erro: " + e.getMessage());
@@ -492,7 +480,7 @@ public class TextUI {
         });
         menu.setHandler(4, () -> {
             try {
-                controlador.estatisticas.tresDivisoesComMaisDispositivos()
+                controlador.getTresDivisoesComMaisDispositivos()
                         .forEach(d -> System.out.println("---\n" + d));
             } catch (Exception e) {
                 System.out.println("Erro: " + e.getMessage());
@@ -505,23 +493,11 @@ public class TextUI {
     // Auxiliares
     // -------------------------------------------------------------------------
 
-    private Casa obterCasa(String idCasa) {
-        // pequena utilidade para obter a Casa via Modelo (read-only)
-        return controlador.estatisticasGetCasa(idCasa);
-    }
-
     private int lerInt() {
         try {
             return Integer.parseInt(sc.nextLine());
         } catch (NumberFormatException e) {
             return 0;
         }
-    }
-
-        public static void main(String[] args) {
-        DomusControl modelo = new DomusControl();
-        Controlador controlador = new Controlador(modelo);
-        TextUI ui = new TextUI(controlador);
-        ui.run();
     }
 }
