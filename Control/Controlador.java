@@ -17,14 +17,14 @@ public class Controlador {
     
 
     
-    // Construtor
+    // Construtor...
 
     public Controlador(DomusControl modelo) {
         this.modelo = modelo;
     }
 
     
-    // Tempo
+    // Tempo...
 
     public void avancarTempo(int minutos) {
         modelo.avancarTempo(minutos);
@@ -36,8 +36,7 @@ public class Controlador {
         return modelo.getTempoAtual();
     }
 
-    // Utilizadores
-   
+    // Utilizadores...
 
     public void criarUtilizador(String id, String password)
             throws UtilizadorJaExisteException {
