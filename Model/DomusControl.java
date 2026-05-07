@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -157,6 +158,31 @@ public class DomusControl implements Serializable {
     public Casa getCasa(String idUtilizador, String idCasa) throws PermissaoNegadaException, UtilizadorNaoEncontradoException, CasaNaoEncontradaException {
         requerAcesso(idUtilizador, idCasa);
         return this.casas.get(idCasa).clone();
+    }
+
+    public int quantosDispositivos(String idUtilizador, String idCasa) throws PermissaoNegadaException, UtilizadorNaoEncontradoException, CasaNaoEncontradaException {
+        requerAcesso(idUtilizador, idCasa);
+        return getCasa(idUtilizador, idCasa).quantosDispositivos();
+    }
+
+    public int quantasDivisoes(String idUtilizador, String idCasa) throws PermissaoNegadaException, UtilizadorNaoEncontradoException, CasaNaoEncontradaException {
+        requerAcesso(idUtilizador, idCasa);
+        return getCasa(idUtilizador, idCasa).quantasDivisoes();
+    }
+
+    public int quantosCenarios(String idUtilizador, String idCasa) throws PermissaoNegadaException, UtilizadorNaoEncontradoException, CasaNaoEncontradaException {
+        requerAcesso(idUtilizador, idCasa);
+        return getCasa(idUtilizador, idCasa).quantosCenarios();
+    }
+
+    public int quantasAutomacoes(String idUtilizador, String idCasa) throws PermissaoNegadaException, UtilizadorNaoEncontradoException, CasaNaoEncontradaException {
+        requerAcesso(idUtilizador, idCasa);
+        return getCasa(idUtilizador, idCasa).quantasAutomacoes();
+    }
+
+    public int quantosEscalonamentos(String idUtilizador, String idCasa) throws PermissaoNegadaException, UtilizadorNaoEncontradoException, CasaNaoEncontradaException {
+        requerAcesso(idUtilizador, idCasa);
+        return getCasa(idUtilizador, idCasa).quantosEscalonamentos();
     }
 
     // --- Gestao de Permissões ---
@@ -377,18 +403,49 @@ public class DomusControl implements Serializable {
                          .orElse(null);
     }
 
+    public List<Dispositivo> getTresDispositivosMaisUtilizadosPorTempo(String idUtilizador, String idCasa)
+            throws PermissaoNegadaException, CasaNaoEncontradaException, UtilizadorNaoEncontradoException {
+        int max = quantosDispositivos(idUtilizador, idCasa);
+        return getCasa(idUtilizador, idCasa).getDispositivos().values().stream()
+                                                              .sorted((d1, d2) -> Long.compare(d2.getTempoLigado(), d1.getTempoLigado()))
+                                                              .collect(Collectors.toList())
+                                                              .subList(0, Math.min(3, max));
+    }
+
+    public List<Dispositivo> getTresDispositivosMaisUtilizadosPorAtivacoes(String idUtilizador, String idCasa)
+            throws PermissaoNegadaException, CasaNaoEncontradaException, UtilizadorNaoEncontradoException {
+        int max = quantosDispositivos(idUtilizador, idCasa);
+        return getCasa(idUtilizador, idCasa).getDispositivos().values().stream()
+                                                              .sorted((d1, d2) -> d2.getAtivacoes() - d1.getAtivacoes())
+                                                              .collect(Collectors.toList())
+                                                              .subList(0, Math.min(3, max));
+    }
+
+    public List<Divisao> getTresDivisoesComMaisDispositivos(String idUtilizador, String idCasa) 
+            throws PermissaoNegadaException, UtilizadorNaoEncontradoException, CasaNaoEncontradaException {
+        int max = quantasDivisoes(idUtilizador, idCasa);
+        return getCasa(idUtilizador, idCasa).getDivisoes().values().stream()
+                                                              .sorted((d1, d2) -> d2.getDispositivos().size() - d1.getDispositivos().size())
+                                                              .collect(Collectors.toList())
+                                                              .subList(0, Math.min(3, max));
+    }
+
     // --- Guardar e Carregar estado ---
 
     public void guardar(String ficheiro) throws IOException {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(ficheiro))) {
-            out.writeObject(this);
-        }
+        FileOutputStream fos = new FileOutputStream(ficheiro);
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+        oos.writeObject(this);
+        oos.flush();
+        oos.close();
     }
 
     public static DomusControl carregar(String ficheiro) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(ficheiro))) {
-            return (DomusControl) in.readObject();
-        }
+        FileInputStream fos = new FileInputStream(ficheiro);
+        ObjectInputStream oos = new ObjectInputStream(fos);
+        DomusControl dc = (DomusControl) oos.readObject();
+        oos.close();
+        return dc;
     }
 
     // --- Overrides de Object ---

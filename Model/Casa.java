@@ -275,23 +275,19 @@ public class Casa implements Serializable{
 
     
     public int quantosDispositivos() {
-        return (int) this.dispositivos.values().stream()
-                                      .count();
+        return this.dispositivos.size();
     }
 
     public int quantasDivisoes() {
-        return (int) this.divisoes.values().stream()
-                                  .count();
+        return this.divisoes.size();
     }
 
     public int quantosCenarios() {
-        return (int) this.cenarios.values().stream()
-                                  .count();
+        return this.cenarios.size();
     }
 
     public int quantasAutomacoes() {
-        return (int) this.automacoes.values().stream()
-                                    .count();
+        return this.automacoes.size();
     }
 
     public int quantosEscalonamentos() {
